@@ -29,3 +29,8 @@ Run the following command:
 
 Run **anchor_evaluation.py** with corresponding arguments for evaluation.
 For example, ``python anchor_evaluation.py --benchmark humaneval --checkpoint deepseek-ai/deepseek-coder-6.7b-instruct --mode instruction --note example --task_id 0 --weight 0.275``.
+
+
+<br><br><br><br>
+![pipeline](https://github.com/magic-YuanTian/Selective-Prompt-Anchoring/assets/75125334/83ec5b1a-bd34-45ff-b439-0b6eeb70bccb)
+<br><br><br><br>
