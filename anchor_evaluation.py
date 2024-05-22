@@ -77,9 +77,9 @@ def run_experiment_on_specific_GPU(args):
     print(f"--------> Processing tasks on GPU {task_id}")
     # Load tasks from the JSONL file
     if benchmark == "humaneval":
-        tasks = load_tasks_from_jsonl('/home/yuan/research/weighted_LM/dataset/HumanEval.jsonl')
+        tasks = load_tasks_from_jsonl('/dataset/HumanEval.jsonl')
     elif benchmark == "mbpp":
-        tasks = load_tasks_from_jsonl('/home/yuan/research/weighted_LM/dataset/mbpp.jsonl')
+        tasks = load_tasks_from_jsonl('/dataset/mbpp.jsonl')
     else:
         raise ValueError("Invalid benchmark")
     
