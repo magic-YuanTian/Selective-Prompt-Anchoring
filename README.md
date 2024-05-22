@@ -2,15 +2,14 @@
 
 This repo includes all the code for **S**elective **P**rompt **A**nchoring (SPA).
 
-SPA enables LLMs to arbitrarily adjust the influence of tokens in the prompt.
+SPA enables LLMs to arbitrarily adjust the influence of tokens in the prompt. It helps LLMs focus on the initial prompt and do not deviate from the original goal when generating a long sequence. It is training-free and potentially model-agnostic.
 
 
-<br><br><br><br>
+<br>
 <div align="center">
   <img src="https://github.com/magic-YuanTian/Selective-Prompt-Anchoring/assets/75125334/83ec5b1a-bd34-45ff-b439-0b6eeb70bccb" style="width:80%; height:auto;">
 </div>
-<br><br><br><br>
-
+<br>
 
 ## Environment
 
