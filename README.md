@@ -7,7 +7,7 @@ SPA enables LLMs to arbitrarily adjust the influence of tokens in the prompt. It
 
 <br>
 <div align="center">
-  <img src="https://github.com/magic-YuanTian/Selective-Prompt-Anchoring/assets/75125334/83ec5b1a-bd34-45ff-b439-0b6eeb70bccb" style="width:80%; height:auto;">
+  <img src="pipeline.png" style="width:80%; height:auto;">
 </div>
 <br>
 
