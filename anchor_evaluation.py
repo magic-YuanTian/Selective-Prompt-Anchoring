@@ -96,16 +96,8 @@ def run_experiment_on_specific_GPU(args):
                 device_map="auto",
                 load_in_8bit=True, # under 20 GB
                 low_cpu_mem_usage=True, # ~20 GB
-                max_memory={3: "22GB", 5: "22GB", 6: "22GB", 7: "22GB"},  # specify which GPU to use and how much memory
-                # max_memory={0: "22GB", 1: "22GB", 2: "22GB", 3: "22GB", 4: "22GB", 5: "22GB", 6: "22GB", 7: "22GB"},
+                max_memory={0: "22GB", 1: "22GB", 2: "22GB", 3: "22GB", 4: "22GB", 5: "22GB", 6: "22GB", 7: "22GB"},
             )
-        
-        # model = AutoModelForCausalLM.from_pretrained(
-        #     checkpoint,
-        #     device_map="cpu",
-        #     load_in_8bit=True,  # under 20 GB
-        #     # low_cpu_mem_usage=True, # ~20 GB
-        # )
     else:
         # model, tokenizer, device = load_model(checkpoint, task_id)
         device = torch.device("cuda:" + str(task_id) if torch.cuda.is_available() else "cpu")
@@ -170,7 +162,7 @@ def run_experiment_on_specific_GPU(args):
             task_id_num = int(task_id.lower().replace('mbpp/', ''))
         
         
-        ############## Skip some tasks ##########################
+        ############## Skip tasks for recovering evaluation ##########################
         # if task_id_num >= 133:
         #     continue
         #########################################################
