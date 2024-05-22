@@ -2,18 +2,16 @@
 
 This repo includes all the code for **S**elective **P**rompt **A**nchoring (SPA).
 
-`weighted_text_utils.py` includes all the utils and helper functions. Necessary instructions are inside the code file.
+**weighted_text_utils.py** includes all the utils and helper functions. Necessary instructions are inside the code file.
 
-`anchor_evaluation.py` serves as the main entry for evaluation. Users can use hyperparameters to specify the evaluation conditions:
-    '--task_id', type=int, default=0, help="Define which GPU to use")
-    # parser.add_argument('--gpu_num', type=int, default=1, help="Define the number of GPUs")
-    parser.add_argument('--checkpoint', type=str, help="Declare which checkpoint to use")
-    parser.add_argument('--benchmark', type=str, help="Declare the benchmark dataset to use")
-    parser.add_argument('--mode', type=str, default="instruction", help="Declare which weight enhancement mode to use")
-    parser.add_argument('--weight', type=float, default=0.5, help="Declare manual weight for instruction mode")
-    parser.add_argument('--use_multiple_gpu', type=bool, default=False, help="Declare if using multiple GPUs")
-    parser.add_argument('--approach', type=str, choices=['difference', 'ratio'], default='difference', help="Declare if add logits difference or multiple probability ratio")
-    parser.add_argument('--mask_test_case', type=bool, default=False, help="For instruct mode, specify if test cases will be masked")
-    parser.add_argument('--mask_entire_prompt', type=bool, default=False, help="When this is true, the entire prompt including template will be masked")
-    parser.add_argument('--note', type=str, help="Addition note for the experiment")
-    
+**anchor_evaluation.py** serves as the main entry for evaluation. Users can use hyperparameters to specify the evaluation conditions:
+1. `checkpoint`: Specify the model path. It can be the HuggingFace checkpoint name.
+2. `benchmark`: Specify the benchmark name. For example, *HumanEval* or *MBPP*.
+3. `mask_test_case`: If this is true, the test cases will be masked and included in the anchored text.
+4. `mask_entire_prompt`: If this is true, the entire prompt will be masked as the anchored text.
+5. `mode`: Specify the evaluation mode. Just input "*instruction*" or leave blank for base SPA.
+6. `weight`: Specify the weighting value **ω**. **0** means simply using the original model. **<0** means reducing the impact of anchored text, while **>0** means amplifying the impact.
+7. `approach`:  Just input "*difference*" or leave blank for base SPA.
+8. `note`: Add notes to this experiment. The note text will appear as the prefix of output files (log file and generated data file).
+9. `task_id`: If there are multiple GPUs, define the GPU ID to use. 
+10. `use_multiple_gpu`: If this is true, evaluation will be conducted on multiple GPUs. You can specify which GPUs to use in [this line](https://github.com/magic-YuanTian/Selective-Prompt-Anchoring/blob/4b637f41e76f5a385aaa51ca4db0ab97859588e0/anchor_evaluation.py#L99).
