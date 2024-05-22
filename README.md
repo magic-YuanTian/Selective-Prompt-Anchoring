@@ -1,1 +1,1 @@
-# Selective-Prompt-Anchoring-SPA-
+# Selective Prompt Anchoring (SPA)
