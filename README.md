@@ -4,6 +4,9 @@ This repo includes all the code for **S**elective **P**rompt **A**nchoring (SPA)
 
 ## Environment
 
+Run the following command:
+
+`pip install -r requirements.txt`
 
 
 ## Code
