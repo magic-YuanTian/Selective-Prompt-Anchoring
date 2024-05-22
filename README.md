@@ -2,6 +2,16 @@
 
 This repo includes all the code for **S**elective **P**rompt **A**nchoring (SPA).
 
+SPA enables LLMs to arbitrarily adjust the influence of tokens in the prompt.
+
+
+<br><br><br><br>
+<div align="center">
+  <img src="https://github.com/magic-YuanTian/Selective-Prompt-Anchoring/assets/75125334/83ec5b1a-bd34-45ff-b439-0b6eeb70bccb" style="width:80%; height:auto;">
+</div>
+<br><br><br><br>
+
+
 ## Environment
 
 Run the following command:
@@ -31,6 +41,3 @@ Run **anchor_evaluation.py** with corresponding arguments for evaluation.
 For example, ``python anchor_evaluation.py --benchmark humaneval --checkpoint deepseek-ai/deepseek-coder-6.7b-instruct --mode instruction --note example --task_id 0 --weight 0.275``.
 
 
-<br><br><br><br>
-![pipeline](https://github.com/magic-YuanTian/Selective-Prompt-Anchoring/assets/75125334/83ec5b1a-bd34-45ff-b439-0b6eeb70bccb)
-<br><br><br><br>
