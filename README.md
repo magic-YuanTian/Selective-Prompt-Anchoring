@@ -24,5 +24,5 @@ This repo includes all the code for **S**elective **P**rompt **A**nchoring (SPA)
 
 ## How to run
 
-Run **anchor_evaluation.py** with corresponding arguments.
+Run **anchor_evaluation.py** with corresponding arguments for evaluation.
 For example, ``python anchor_evaluation.py --benchmark humaneval --checkpoint deepseek-ai/deepseek-coder-6.7b-instruct --mode instruction --note example --task_id 0 --weight 0.275``.
