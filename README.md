@@ -37,6 +37,9 @@ Run the following command:
 ## How to run
 
 Run **anchor_evaluation.py** with corresponding arguments for evaluation.
-For example, ``python anchor_evaluation.py --benchmark humaneval --checkpoint deepseek-ai/deepseek-coder-6.7b-instruct --mode instruction --note example --task_id 0 --weight 0.275``.
+
+For example: 
+
+  ``python anchor_evaluation.py --benchmark humaneval --checkpoint deepseek-ai/deepseek-coder-6.7b-instruct --mode instruction --note example --task_id 0 --weight 0.275``.
 
 
