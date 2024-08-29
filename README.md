@@ -1,6 +1,6 @@
 # Selective Prompt Anchoring (SPA)
 
-This repo includes all the code for **S**elective **P**rompt **A**nchoring (SPA).
+This repo includes all the code for **S**elective **P**rompt **A**nchoring (SPA). Please check [our paper](https://www.arxiv.org/abs/2408.09121).
 
 SPA enables LLMs to arbitrarily adjust the influence of tokens in the prompt. It helps LLMs focus on the initial prompt and do not deviate from the original goal when generating a long sequence. It is training-free and potentially model-agnostic.
 
