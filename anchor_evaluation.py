@@ -118,11 +118,11 @@ def run_experiment_on_specific_GPU(args):
     model_name = checkpoint.split('/')[-1]
     
     if benchmark == "humaneval":
-        log_dir = f'/home/yuan/research/weighted_LM/log/humaneval/{model_name}'
-        generate_data_dir = f'/home/yuan/research/weighted_LM/generated_data/humaneval/{model_name}'
+        log_dir = f'/home/research/weighted_LM/log/humaneval/{model_name}'
+        generate_data_dir = f'/home/research/weighted_LM/generated_data/humaneval/{model_name}'
     elif benchmark == "mbpp":
-        log_dir = f'/home/yuan/research/weighted_LM/log/mbpp/{model_name}'
-        generate_data_dir = f'/home/yuan/research/weighted_LM/generated_data/mbpp/zero_shot/{model_name}'
+        log_dir = f'/home/research/weighted_LM/log/mbpp/{model_name}'
+        generate_data_dir = f'/home/research/weighted_LM/generated_data/mbpp/zero_shot/{model_name}'
     else:
         raise ValueError("Invalid benchmark")
 
