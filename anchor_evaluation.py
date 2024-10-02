@@ -25,12 +25,9 @@ def main():
     # get value from the command line (Parse the arguments)
     args = parser.parse_args()
 
-
     # args.task_id = 6
     # args.checkpoint = "deepseek-ai/deepseek-coder-6.7b-instruct"
     # args.benchmark = "mbpp"
-
-    
 
     # print the arguments
     print(f"Checkpoint: {args.checkpoint}")
@@ -44,7 +41,6 @@ def main():
     print(f"Note: {args.note}")
     print(f"Mask entire prompt: {args.mask_entire_prompt}")
     
-
     
     # run the experiment
     run_experiment_on_specific_GPU(args)
@@ -77,12 +73,14 @@ def run_experiment_on_specific_GPU(args):
     print(f"--------> Processing tasks on GPU {task_id}")
     # Load tasks from the JSONL file
     if benchmark == "humaneval":
-        tasks = load_tasks_from_jsonl('/dataset/HumanEval.jsonl')
+        # tasks = load_tasks_from_jsonl('/home/research/weighted_LM/dataset/HumanEval.jsonl')
+        tasks = load_tasks_from_jsonl('/home/research/weighted_LM/dataset/HumanEval_test.jsonl')
+        tasks = load_tasks_from_jsonl('/home/research/weighted_LM/dataset/HumanEval_test2.jsonl')  # temporary split tasks, remove later
+        
     elif benchmark == "mbpp":
-        tasks = load_tasks_from_jsonl('/dataset/mbpp.jsonl')
+        tasks = load_tasks_from_jsonl('/home/research/weighted_LM/dataset/mbpp.jsonl')
     else:
         raise ValueError("Invalid benchmark")
-    
     
     
     # tokenizer
@@ -96,8 +94,16 @@ def run_experiment_on_specific_GPU(args):
                 device_map="auto",
                 load_in_8bit=True, # under 20 GB
                 low_cpu_mem_usage=True, # ~20 GB
-                max_memory={0: "22GB", 1: "22GB", 2: "22GB", 3: "22GB", 4: "22GB", 5: "22GB", 6: "22GB", 7: "22GB"},
+                max_memory={3: "22GB", 5: "22GB", 6: "22GB", 7: "22GB"},  # specify which GPU to use and how much memory
+                # max_memory={0: "22GB", 1: "22GB", 2: "22GB", 3: "22GB", 4: "22GB", 5: "22GB", 6: "22GB", 7: "22GB"},
             )
+        
+        # model = AutoModelForCausalLM.from_pretrained(
+        #     checkpoint,
+        #     device_map="cpu",
+        #     load_in_8bit=True,  # under 20 GB
+        #     # low_cpu_mem_usage=True, # ~20 GB
+        # )
     else:
         # model, tokenizer, device = load_model(checkpoint, task_id)
         device = torch.device("cuda:" + str(task_id) if torch.cuda.is_available() else "cpu")
@@ -162,7 +168,7 @@ def run_experiment_on_specific_GPU(args):
             task_id_num = int(task_id.lower().replace('mbpp/', ''))
         
         
-        ############## Skip tasks for recovering evaluation ##########################
+        ############## Skip some tasks ##########################
         # if task_id_num >= 133:
         #     continue
         #########################################################
@@ -178,32 +184,65 @@ def run_experiment_on_specific_GPU(args):
                 if mask_entire_prompt:
                     prompt_mask = mask_tok
                 else:
-                    '''instruction'''
+                    '''Dataset'''
                     if benchmark == "humaneval":
                         prompt_mask = mask_humanEval_instruction(prompt, mask_tok=mask_tok, mask_test_case=mask_test_case)  # get masked prompt
                     elif benchmark == "mbpp":
                         pure_prompt = data['prompt']
                         prompt_mask = prompt.replace(pure_prompt, mask_tok)  # mask the initial prompt
                 
+                
                 if mode == "normal":
-                    all_chat, completion, code = normal_generate_deepseek_instruct(prompt, model, tokenizer, device=model.device, task='python', max_length=1993, log_path=log_file)
+                    all_chat, completion, code = normal_generate_deepseek_instruct(prompt, model, tokenizer, device=model.device, task='python', max_length=500, log_path=log_file)
+                
+                elif mode == "temperature":
+                    code_list = greedy_search_with_temperature(
+                        raw_prompt=prompt,
+                        model=model,
+                        tokenizer=tokenizer,
+                        max_length=500,
+                        device=model.device,
+                        num_candidates=10,
+                        temperature=1.2,
+                        top_p=0.9
+                    )
+                
+                
+                elif mode =="beam":
+                    _, code_list = augmented_generate_anchor_beam_search(
+                        raw_prompt=prompt,
+                        raw_masked_prompt=prompt_mask,
+                        checkpoint_name=checkpoint,
+                        model=model,
+                        tokenizer=tokenizer,
+                        max_length=420,
+                        device=model.device,
+                        language='python',
+                        benchmark=benchmark,
+                        weight=weight,
+                        num_beams=10,
+                    )
+
+
+                # Generate based on input arguments (instruction)
                 elif mode == "instruction":
+                    # Main method for **SPA**
                     if args.approach == 'difference':
-                        all_chat, _, code = augmented_generate_anchor(prompt, prompt_mask, model=model, tokenizer=tokenizer, checkpoint_name=checkpoint, weight=weight, device=model.device, language='python', benchmark=benchmark, max_length=750, log_path=log_file)
+                        all_chat, _, code = augmented_generate_anchor(prompt, prompt_mask, model=model, tokenizer=tokenizer, checkpoint_name=checkpoint, weight=weight, device=model.device, language='python', benchmark=benchmark, max_length=500, log_path=log_file)
                     elif args.approach == 'ratio':
-                        all_chat, _, code = augmented_generate_anchor(prompt, prompt_mask, model=model, tokenizer=tokenizer, checkpoint_name=checkpoint, weight=weight, device=model.device, task='python', benchmark=benchmark, max_length=750, log_path=log_file)
+                        all_chat, _, code = augmented_generate_anchor(prompt, prompt_mask, model=model, tokenizer=tokenizer, checkpoint_name=checkpoint, weight=weight, device=model.device, task='python', benchmark=benchmark, max_length=500, log_path=log_file)
                     else:
                         raise ValueError("Invalid approach")
                 elif mode == "instruction_adaptive":
-                    all_chat, _, code = augmented_generate_anchor(prompt, prompt_mask, model=model, tokenizer=tokenizer, checkpoint_name=checkpoint, weight=weight, device=model.device, language='python', benchmark=benchmark, max_length=750, log_path=log_file, adaptive_attention_weight=True)
+                    all_chat, _, code = augmented_generate_anchor(prompt, prompt_mask, model=model, tokenizer=tokenizer, checkpoint_name=checkpoint, weight=weight, device=model.device, language='python', benchmark=benchmark, max_length=500, log_path=log_file, adaptive_attention_weight=True)
                 elif mode == "instruction_confidence":
-                    all_chat, _, code = augmented_generate_deepseek_instruct_confidence(prompt, prompt_mask, model, tokenizer, weight=weight, device=model.device, task='python', benchmark=benchmark, max_length=1500, log_path=log_file)
+                    all_chat, _, code = augmented_generate_deepseek_instruct_confidence(prompt, prompt_mask, model, tokenizer, weight=weight, device=model.device, task='python', benchmark=benchmark, max_length=500, log_path=log_file)
                 elif mode == "self_attention":
                     _, _, code = augmented_generate_deepseek_self_attention(prompt, model, tokenizer, weight=weight, device=model.device, task='python', benchmark=benchmark, max_length=1500, log_path=log_file)
                 elif mode == "sample":
-                    solution, completion = sample_augment_generate(prompt, model, mask_tok=mask_tok, max_length=2500, top_k=10, max_sample=500, tokenizer=tokenizer, device=device, log_path=log_file)
+                    solution, completion = sample_augment_generate(prompt, model, mask_tok=mask_tok, max_length=500, top_k=10, max_sample=500, tokenizer=tokenizer, device=device, log_path=log_file)
                 elif mode == "attention_change":
-                    # _, attention_change, code = augmented_generate_anchor(prompt, prompt_mask, model=model, tokenizer=tokenizer, checkpoint_name=checkpoint, weight=0, device=model.device, language='python', benchmark=benchmark, max_length=750, output_attentions=True, log_path=log_file)
+                    # _, attention_change, code = augmented_generate_anchor(prompt, prompt_mask, model=model, tokenizer=tokenizer, checkpoint_name=checkpoint, weight=0, device=model.device, language='python', benchmark=benchmark, max_length=500, output_attentions=True, log_path=log_file)
                     _, attention_change, code = augmented_generate_anchor(prompt, prompt_mask, model=model, tokenizer=tokenizer, checkpoint_name=checkpoint, weight=weight, device=model.device, language='python', benchmark=benchmark, output_attentions=True, max_length=600, log_path=log_file)
                     
                     self_attention_change = attention_change[0]
@@ -225,15 +264,24 @@ def run_experiment_on_specific_GPU(args):
                     raise ValueError("Invalid mode")
 
 
-                # post process for text completion in humaneval
-                if benchmark == "humaneval":
-                    if 'codgen' in checkpoint.lower() or 'codellama' in checkpoint.lower():
-                        code = prompt + code
+
+                # # post process for text completion in humaneval
+                # if benchmark == "humaneval":
+                #     if 'codegen' in checkpoint.lower() or 'codellama' in checkpoint.lower():
+                #         code = prompt + code
                 
                 
-                # create the dict element to save
-                # generate_data_element = {'task_id': data['task_id'], 'prompt': prompt, 'solution': code, 'canonical_solution': data['canonical_solution'], 'test': data['test'], 'entry_point': data['entry_point']}
-                generate_data_element = {'task_id': data['task_id'], 'prompt': prompt, 'solution': code, 'canonical_solution': data['canonical_solution']}
+                if mode == "beam" or mode == "temperature":
+                    # create multiple data elements
+                    for i, code_item in enumerate(code_list):
+                        generate_data_element = {'task_id': data['task_id'], 'prompt': prompt, 'solution': code_item, 'canonical_solution': data['canonical_solution']}
+                        with open(generate_file, 'a') as f:
+                            f.write(json.dumps(generate_data_element) + '\n')
+                else:
+                    generate_data_element = {'task_id': data['task_id'], 'prompt': prompt, 'solution': code, 'canonical_solution': data['canonical_solution']}
+                
+                
+                
                 # save the new generated data onto generate_file_path
                 with open(generate_file, 'a') as f:
                     f.write(json.dumps(generate_data_element) + '\n')
