@@ -2,8 +2,8 @@ import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3,4,5,6,7"  # specify which GPU(s) to be used
 
 import contextlib
-from evalplus.data import get_human_eval_plus, write_jsonl
-from human_eval.data import write_jsonl, read_problems
+# from evalplus.data import get_human_eval_plus, write_jsonl
+# from human_eval.data import write_jsonl, read_problems
 from transformers import AutoModelForCausalLM, AutoTokenizer, AutoConfig
 from transformers import LlamaForCausalLM, CodeLlamaTokenizer
 import torch.nn.functional as F
@@ -21,7 +21,6 @@ from IPython.display import display, HTML
 from IPython.display import display, HTML, clear_output
 import time
 import datetime
-import spacy
 import numpy as np
 from scipy.optimize import minimize
 from bisect import insort
@@ -164,7 +163,8 @@ def mask_mbpp_instruction_with_shots(prompt, mask_tok):
 
 
 # According to the format of humanEval data, only mask the instruction part, return the masked prompt
-def mask_humanEval_instruction(prompt, mask_tok, mask_test_case=False):
+# reverse_mask: if True, mask the reduce non-anchored parts 
+def mask_humanEval_instruction(prompt, mask_tok, mask_test_case=False, reverse_mask=False):
     
     # get previous code and the last function
     previous_code, last_function = find_last_python_function(prompt)
@@ -196,7 +196,13 @@ def mask_humanEval_instruction(prompt, mask_tok, mask_test_case=False):
         instruction_lines.append(line)
     # Join the instruction lines back into a single string and return it
     instruction_part = '\n'.join(instruction_lines).strip()
-    result = last_function.replace(instruction_part, mask_tok)
+    
+    if reverse_mask:
+        # replace the non-instruction part with mask_tok
+        result = mask_tok + instruction_part + mask_tok
+    else:
+        # replace the instruction part with mask_tok
+        result = last_function.replace(instruction_part, mask_tok)
     
     # add previous code
     result = previous_code + result
@@ -308,13 +314,13 @@ def has_complete_python_function_generation_deepseek(text) -> bool:
     bool: True if the text contains a Python code snippet, False otherwise.
     """
     
-    start_marker = "```python\n"
-    end_marker = "```\n"
-    start_index = text.find(start_marker)
-    end_index = text.find(end_marker, start_index + len(start_marker))
-    
-    return start_index != -1 and end_index != -1 and end_index > start_index
-
+    # implement based on regular expression
+    pattern = r"```python(.*?)```"
+    match = re.search(pattern, text, re.DOTALL)
+    if match:
+        code_snippet = match.group(1).strip()
+        return code_snippet != ''
+    return False
 
 
 # Given the string of a function to detect the function is completed writting. In other words, there is more than 1 line that is not indented.
@@ -2741,9 +2747,116 @@ def other_stop_condition(new_tok):
     
     return False
 
+
+
+
+# temperature greedy decoding
+def greedy_search_with_temperature(
+    raw_prompt,
+    model,
+    tokenizer,
+    max_length,
+    device,
+    num_candidates=10,
+    temperature=1.2,
+    top_p=0.9
+):
+    """
+    Generate code using greedy search with temperature for pass@10 calculation.
+
+    This function generates multiple code candidates using a greedy search approach
+    with temperature scaling and nucleus (top-p) sampling. It's designed to produce
+    diverse outputs for pass@10 evaluation in code generation tasks.
+
+    Args:
+        raw_prompt (str): The input prompt to guide code generation.
+        model: The language model used for generation.
+        tokenizer: The tokenizer corresponding to the model.
+        max_length (int): Maximum length of the generated sequence.
+        device: The device (CPU or GPU) to run the model on.
+        num_candidates (int): Number of code candidates to generate (default is 10 for pass@10).
+        temperature (float): Temperature for logits scaling. Higher values increase randomness.
+        top_p (float): Cumulative probability threshold for nucleus sampling.
+
+    Returns:
+        list: A list of 'num_candidates' generated code snippets for pass@10 calculation.
+
+    Note:
+        - Higher temperature values lead to more diverse but potentially less coherent outputs.
+        - The top_p parameter helps to filter out low-probability tokens, maintaining output quality.
+    """
+    print(f"Starting greedy search with temperature for {num_candidates} candidates")
+    print(f"Temperature: {temperature}, Top-p: {top_p}")
+    print(f"Maximum sequence length: {max_length}")
+    
+    model.eval()
+    results = []
+    total_start_time = time.time()
+
+    for candidate in range(num_candidates):
+        start_time = time.time()
+        print(f"\nGenerating candidate {candidate + 1}/{num_candidates}")
+        
+        input_ids = tokenizer.encode(raw_prompt, return_tensors="pt").to(device)
+        print(f"Input prompt length: {input_ids.shape[1]} tokens")
+        
+        with torch.no_grad():
+            for step in range(max_length - input_ids.shape[1]):
+                outputs = model(input_ids)
+                next_token_logits = outputs.logits[:, -1, :] / temperature
+                
+                # Apply top-p (nucleus) sampling
+                sorted_logits, sorted_indices = torch.sort(next_token_logits, descending=True)
+                cumulative_probs = torch.cumsum(F.softmax(sorted_logits, dim=-1), dim=-1)
+                sorted_indices_to_remove = cumulative_probs > top_p
+                sorted_indices_to_remove[..., 1:] = sorted_indices_to_remove[..., :-1].clone()
+                sorted_indices_to_remove[..., 0] = 0
+                indices_to_remove = sorted_indices[sorted_indices_to_remove]
+                next_token_logits[:, indices_to_remove] = -float('Inf')
+                
+                # Sample next token
+                probs = F.softmax(next_token_logits, dim=-1)
+                next_token = torch.multinomial(probs, num_samples=1)
+                
+                # Append the new token to the sequence
+                input_ids = torch.cat([input_ids, next_token], dim=-1)
+                
+                # Print progress every 20 steps
+                if step % 20 == 0:
+                    print(f"  Step {step}: Current length = {input_ids.shape[1]} tokens")
+                
+                # Check if EOS token is generated
+                if next_token.item() == tokenizer.eos_token_id:
+                    print(f"  EOS token generated at step {step}")
+                    break
+        
+        # Decode the generated sequence
+        generated_string = tokenizer.decode(input_ids[0], skip_special_tokens=True)
+        
+        # Extract code snippet
+        try:
+            entire_code = get_code_snippets_deepseek(generated_string)
+            print("  Successfully extracted code snippet")
+        except Exception as e:
+            entire_code = generated_string
+            print(f"  Failed to extract code snippet: {str(e)}")
+        
+        results.append(entire_code)
+        
+        end_time = time.time()
+        print(f"Candidate {candidate + 1} generated in {end_time - start_time:.2f} seconds")
+        print(f"Generated sequence length: {len(entire_code)} characters")
+
+    total_end_time = time.time()
+    print(f"\nGeneration complete. Total time: {total_end_time - total_start_time:.2f} seconds")
+    print(f"Average time per candidate: {(total_end_time - total_start_time) / num_candidates:.2f} seconds")
+
+    return results
+
+
 # MAIN
 # create a funciton used to enhance the logits of the focused word during the decoding process (the generate function)
-def augmented_generate_anchor(raw_prompt, raw_masked_prompt, checkpoint_name, model, tokenizer, max_length, device, language, benchmark, weight=0.275, output_attentions=True, compute_self_attention=True, compute_gradient=True, adaptive_attention_weight=False, log_path=None):
+def augmented_generate_anchor(raw_prompt, raw_masked_prompt, checkpoint_name, model, tokenizer, max_length, device, language, benchmark, weight=0.275, output_attentions=False, compute_self_attention=False, compute_gradient=False, adaptive_attention_weight=False, log_path=None, print_code_to_console=True):
     
     # preparation
     model.eval()
@@ -2751,7 +2864,7 @@ def augmented_generate_anchor(raw_prompt, raw_masked_prompt, checkpoint_name, mo
     
     # original inputs
     input_ids_ori = prompt_to_inputs(raw_prompt, tokenizer, checkpoint_name, benchmark, language, device).to(device)
-    # masked inputs
+    # masked inputs  
     input_ids_mask = prompt_to_inputs(raw_masked_prompt, tokenizer, checkpoint_name, benchmark, language, device).to(device)
     
     # caculate the mask length
@@ -2759,10 +2872,6 @@ def augmented_generate_anchor(raw_prompt, raw_masked_prompt, checkpoint_name, mo
     
     # get the length of input_ids_ori
     init_input_ids_len = len(input_ids_ori[0])
-    # for attention calculation of the selected part    
-    # masked_range = find_single_masked_index_range(input_ids_ori[0].tolist(), input_ids_mask[0].tolist())
-    # if masked_range is None:
-    #     raise Exception("The masked range is None")
     
     if adaptive_attention_weight:
         output_attentions = True
@@ -2772,7 +2881,9 @@ def augmented_generate_anchor(raw_prompt, raw_masked_prompt, checkpoint_name, mo
     cur_prompt = ori_prompt
     pre_prompt = ori_prompt
     
-    print(ori_prompt, end="", flush=True)
+    if print_code_to_console:
+        print(ori_prompt, end="", flush=True)
+    
     if log_path is not None:
         # if the file does not exist, create it
         if not os.path.exists(log_path):
@@ -2788,51 +2899,57 @@ def augmented_generate_anchor(raw_prompt, raw_masked_prompt, checkpoint_name, mo
     attention_to_ori_prompt_list_self = []  # used to store the attention to the original prompt (self-attention)
     attention_to_ori_prompt_list_gradient = []  # used to store the attention to the original prompt (gradient attention)
     
+    # Initialize KV cache
+    past_key_values_ori = None
+    past_key_values_mask = None
     
     # if output_attentions is true, with gradient, otherwise, torch.no_grad()
-    # with torch.no_grad():
     with conditional_no_grad(output_attentions):
         for _ in range(max_length - len(input_ids_ori[0])):
-            outputs_ori = model(input_ids_ori, output_attentions=output_attentions)  # inference
-            next_token_logits_ori = outputs_ori.logits[:, -1, :]  # get the logits of original and masked prompt
+            # Use KV cache for original prompt
+            if past_key_values_ori is None:
+                outputs_ori = model(input_ids_ori, output_attentions=output_attentions, use_cache=True)
+                next_token_logits_ori = outputs_ori.logits[:, -1, :]
+                past_key_values_ori = outputs_ori.past_key_values
+            else:
+                outputs_ori = model(input_ids_ori[:, -1:], output_attentions=output_attentions, use_cache=True, past_key_values=past_key_values_ori)
+                next_token_logits_ori = outputs_ori.logits[:, -1, :]
+                past_key_values_ori = outputs_ori.past_key_values
             
             if output_attentions:
                 if compute_self_attention:
                     attention_ori_self = get_self_attention(input_ids_ori, outputs_ori)
-                    attention_sum_self = sum(attention_ori_self[:init_input_ids_len])  # all the original prompt attentions
-                    # attention_sum = sum(attention_ori[masked_range[0]:masked_range[1]])  # only the attentions of the masked part 
+                    attention_sum_self = sum(attention_ori_self[:init_input_ids_len])
                     if attention_sum_self > 1:
                         attention_sum_self = 1
                     attention_to_ori_prompt_list_self.append(attention_sum_self)
                 
                 if compute_gradient:
                     attention_ori_gradient = get_gradient_attention(input_ids_ori, model, topk = 100)
-                    attention_sum_gradient = sum(attention_ori_gradient[:init_input_ids_len])  # all the original prompt attentions
+                    attention_sum_gradient = sum(attention_ori_gradient[:init_input_ids_len])
                     if attention_sum_gradient > 1:
                         attention_sum_gradient = 1
                     attention_to_ori_prompt_list_gradient.append(attention_sum_gradient)
-
             
             if ori_weight != 0:
-                outputs_mask = model(input_ids_mask, output_attentions=output_attentions)  # inference
-                next_token_logits_mask = outputs_mask.logits[:, -1, :]  # get the logits of original and masked prompt
+                # Use KV cache for masked prompt
+                if past_key_values_mask is None:
+                    outputs_mask = model(input_ids_mask, output_attentions=output_attentions, use_cache=True)
+                    next_token_logits_mask = outputs_mask.logits[:, -1, :]
+                    past_key_values_mask = outputs_mask.past_key_values
+                else:
+                    outputs_mask = model(input_ids_mask[:, -1:], output_attentions=output_attentions, use_cache=True, past_key_values=past_key_values_mask)
+                    next_token_logits_mask = outputs_mask.logits[:, -1, :]
+                    past_key_values_mask = outputs_mask.past_key_values
                         
                 logit_deviation = (next_token_logits_ori - next_token_logits_mask).detach()
                 
                 # decide weight based on the attention (if it is adpative) and given weight
                 if adaptive_attention_weight:
-                    cur_input_ids_len = len(input_ids_ori[0])  # calculate the current input_ids length for adjusting the weight
-                    # weight = (cur_input_ids_len - mask_len) / mask_len * ori_weight
+                    cur_input_ids_len = len(input_ids_ori[0])
                     weight = (cur_input_ids_len - init_input_ids_len) / mask_len * ori_weight
-                    
-                    # print('\nmask_len: ', mask_len, flush=True)
-                    # print('\ninit_input_ids_len: ', init_input_ids_len, flush=True)
-                    # print('\ncur_input_ids_len: ', cur_input_ids_len, flush=True)
-                    # print('\nweight: ', weight, flush=True)
                 
                 next_token_logits_augmented = (next_token_logits_ori + logit_deviation * weight).detach()
-                # next_token_logits_augmented = next_token_logits_augmented / (weight + 1)
-                # Use Z-score to normalize the logits
                 next_token_logits_augmented = z_score(next_token_logits_augmented).detach()
             
             else:
@@ -2840,11 +2957,6 @@ def augmented_generate_anchor(raw_prompt, raw_masked_prompt, checkpoint_name, mo
             
             # get the next token
             next_token_idx = torch.argmax(next_token_logits_augmented, dim=-1).unsqueeze(0).detach()
-
-            
-            # convert this logit to softmax probability, and return this highest probability (as confidence)
-            # confidence = F.softmax(next_token_logits_augmented, dim=-1).max().item().detach()
-            # print('\nnext token: ', tokenizer.decode(next_token_idx[0]), '  |  confidence: ', confidence, flush=True)
             
             # update the input_ids
             pre_input_ids_ori = copy.deepcopy(input_ids_ori)
@@ -2856,9 +2968,8 @@ def augmented_generate_anchor(raw_prompt, raw_masked_prompt, checkpoint_name, mo
             
             # print the current prompt
             cur_prompt = tokenizer.decode(input_ids_ori[0])
-
             
-            if next_token_idx[0].item() == tokenizer.eos_token_id: # break if <eos> token is generated
+            if next_token_idx[0].item() == tokenizer.eos_token_id:
                 break
             
             # get new added tokens in the current prompt compared to the previous prompt
@@ -2868,24 +2979,18 @@ def augmented_generate_anchor(raw_prompt, raw_masked_prompt, checkpoint_name, mo
             if other_stop_condition(new_tok):
                 break
             
-            
             # update generated_string
             generated_string_pre = generated_string
             generated_string += new_tok
             
-            # if language == 'python':
-            #     # if has_complete_python_function_generation(prompt_without_docstring, prompt_without_docstring + generated_string):
-            #     if has_complete_python_function_generation_deepseek(generated_string):
-            
             # determine if the code generation process should stop
             if stop_condition(generated_string, ori_prompt, language, benchmark, checkpoint_name):
                 input_ids_ori = pre_input_ids_ori
-                generated_string = generated_string_pre
                 break
             
-            print(new_tok, end="", flush=True)
+            if print_code_to_console:
+                print(new_tok, end="", flush=True)
             
-            # if log_path is not None, write (append to original content without new line) the new token to the log file
             if log_path is not None:
                 with open(log_path, 'a') as f:
                     f.write(new_tok)
@@ -2905,8 +3010,448 @@ def augmented_generate_anchor(raw_prompt, raw_masked_prompt, checkpoint_name, mo
         entire_code = get_code_snippets_deepseek(generated_string)
     except:
         entire_code = generated_string
+        
+    # add prompt for pure completion models (for humaneval)
+    if benchmark == "humaneval":
+        if 'codegen' in checkpoint_name.lower() or 'codellama' in checkpoint_name.lower():
+            entire_code = raw_prompt + entire_code
 
     return output_sequence, (attention_to_ori_prompt_list_self, attention_to_ori_prompt_list_gradient), entire_code
+
+
+
+# # OLD MAIN
+# # create a funciton used to enhance the logits of the focused word during the decoding process (the generate function)
+# def augmented_generate_anchor(raw_prompt, raw_masked_prompt, checkpoint_name, model, tokenizer, max_length, device, language, benchmark, weight=0.275, output_attentions=False, compute_self_attention=False, compute_gradient=False, adaptive_attention_weight=False, log_path=None, print_code_to_console=True):
+    
+#     # preparation
+#     model.eval()
+#     ori_weight = weight  # store the original base weight
+    
+#     # original inputs
+#     input_ids_ori = prompt_to_inputs(raw_prompt, tokenizer, checkpoint_name, benchmark, language, device).to(device)
+#     # masked inputs
+#     input_ids_mask = prompt_to_inputs(raw_masked_prompt, tokenizer, checkpoint_name, benchmark, language, device).to(device)
+    
+#     # caculate the mask length
+#     mask_len = len(input_ids_ori[0]) - len(input_ids_mask[0]) + 1
+    
+#     # get the length of input_ids_ori
+#     init_input_ids_len = len(input_ids_ori[0])
+#     # for attention calculation of the selected part    
+#     # masked_range = find_single_masked_index_range(input_ids_ori[0].tolist(), input_ids_mask[0].tolist())
+#     # if masked_range is None:
+#     #     raise Exception("The masked range is None")
+    
+#     if adaptive_attention_weight:
+#         output_attentions = True
+    
+#     ori_prompt = tokenizer.decode(input_ids_ori[0], skip_special_tokens=False)
+    
+#     cur_prompt = ori_prompt
+#     pre_prompt = ori_prompt
+    
+#     if print_code_to_console:
+#         print(ori_prompt, end="", flush=True)
+    
+#     if log_path is not None:
+#         # if the file does not exist, create it
+#         if not os.path.exists(log_path):
+#             with open(log_path, 'w') as f:
+#                 f.write(ori_prompt)
+#         else:
+#             with open(log_path, 'a') as f:
+#                 f.write(ori_prompt)
+    
+#     # only the generated part
+#     generated_string = ''
+    
+#     attention_to_ori_prompt_list_self = []  # used to store the attention to the original prompt (self-attention)
+#     attention_to_ori_prompt_list_gradient = []  # used to store the attention to the original prompt (gradient attention)
+    
+    
+#     # if output_attentions is true, with gradient, otherwise, torch.no_grad()
+#     # with torch.no_grad():
+#     with conditional_no_grad(output_attentions):
+#         for _ in range(max_length - len(input_ids_ori[0])):
+#             outputs_ori = model(input_ids_ori, output_attentions=output_attentions)  # inference
+#             next_token_logits_ori = outputs_ori.logits[:, -1, :]  # get the logits of original and masked prompt
+            
+#             if output_attentions:
+#                 if compute_self_attention:
+#                     attention_ori_self = get_self_attention(input_ids_ori, outputs_ori)
+#                     attention_sum_self = sum(attention_ori_self[:init_input_ids_len])  # all the original prompt attentions
+#                     # attention_sum = sum(attention_ori[masked_range[0]:masked_range[1]])  # only the attentions of the masked part 
+#                     if attention_sum_self > 1:
+#                         attention_sum_self = 1
+#                     attention_to_ori_prompt_list_self.append(attention_sum_self)
+                
+#                 if compute_gradient:
+#                     attention_ori_gradient = get_gradient_attention(input_ids_ori, model, topk = 100)
+#                     attention_sum_gradient = sum(attention_ori_gradient[:init_input_ids_len])  # all the original prompt attentions
+#                     if attention_sum_gradient > 1:
+#                         attention_sum_gradient = 1
+#                     attention_to_ori_prompt_list_gradient.append(attention_sum_gradient)
+
+            
+#             if ori_weight != 0:
+#                 outputs_mask = model(input_ids_mask, output_attentions=output_attentions)  # inference
+#                 next_token_logits_mask = outputs_mask.logits[:, -1, :]  # get the logits of original and masked prompt
+                        
+#                 logit_deviation = (next_token_logits_ori - next_token_logits_mask).detach()
+                
+#                 # decide weight based on the attention (if it is adpative) and given weight
+#                 if adaptive_attention_weight:
+#                     cur_input_ids_len = len(input_ids_ori[0])  # calculate the current input_ids length for adjusting the weight
+#                     # weight = (cur_input_ids_len - mask_len) / mask_len * ori_weight
+#                     weight = (cur_input_ids_len - init_input_ids_len) / mask_len * ori_weight
+                    
+#                     # print('\nmask_len: ', mask_len, flush=True)
+#                     # print('\ninit_input_ids_len: ', init_input_ids_len, flush=True)
+#                     # print('\ncur_input_ids_len: ', cur_input_ids_len, flush=True)
+#                     # print('\nweight: ', weight, flush=True)
+                
+#                 next_token_logits_augmented = (next_token_logits_ori + logit_deviation * weight).detach()
+#                 # next_token_logits_augmented = next_token_logits_augmented / (weight + 1)
+#                 # Use Z-score to normalize the logits
+#                 next_token_logits_augmented = z_score(next_token_logits_augmented).detach()
+            
+#             else:
+#                 next_token_logits_augmented = next_token_logits_ori.detach()
+            
+#             # get the next token
+#             next_token_idx = torch.argmax(next_token_logits_augmented, dim=-1).unsqueeze(0).detach()
+
+            
+#             # convert this logit to softmax probability, and return this highest probability (as confidence)
+#             # confidence = F.softmax(next_token_logits_augmented, dim=-1).max().item().detach()
+#             # print('\nnext token: ', tokenizer.decode(next_token_idx[0]), '  |  confidence: ', confidence, flush=True)
+            
+#             # update the input_ids
+#             pre_input_ids_ori = copy.deepcopy(input_ids_ori)
+#             input_ids_ori = torch.cat([input_ids_ori, next_token_idx], dim=-1).to(device)
+#             input_ids_mask = torch.cat([input_ids_mask, next_token_idx], dim=-1).to(device)
+            
+#             input_ids_ori = input_ids_ori.detach().to(device)
+#             input_ids_mask = input_ids_mask.detach().to(device)
+            
+#             # print the current prompt
+#             cur_prompt = tokenizer.decode(input_ids_ori[0])
+
+            
+#             if next_token_idx[0].item() == tokenizer.eos_token_id: # break if <eos> token is generated
+#                 break
+            
+#             # get new added tokens in the current prompt compared to the previous prompt
+#             new_tok = cur_prompt[len(pre_prompt):]
+            
+#             # add special stop condition
+#             if other_stop_condition(new_tok):
+#                 break
+            
+            
+#             # update generated_string
+#             generated_string_pre = generated_string
+#             generated_string += new_tok
+            
+#             # if language == 'python':
+#             #     # if has_complete_python_function_generation(prompt_without_docstring, prompt_without_docstring + generated_string):
+#             #     if has_complete_python_function_generation_deepseek(generated_string):
+            
+#             # determine if the code generation process should stop
+#             if stop_condition(generated_string, ori_prompt, language, benchmark, checkpoint_name):
+#                 input_ids_ori = pre_input_ids_ori
+#                 # generated_string = generated_string_pre
+#                 break
+            
+#             if print_code_to_console:
+#                 print(new_tok, end="", flush=True)
+            
+#             # if log_path is not None, write (append to original content without new line) the new token to the log file
+#             if log_path is not None:
+#                 with open(log_path, 'a') as f:
+#                     f.write(new_tok)
+
+#             # update the previous prompt
+#             pre_prompt = cur_prompt
+            
+#             # clear GPU memory
+#             torch.cuda.empty_cache()
+#             gc.collect()
+    
+#     # Decode the tokens to string
+#     output_sequence = tokenizer.decode(input_ids_ori[0])
+
+#     # get the code between ```python and ```
+#     try:
+#         entire_code = get_code_snippets_deepseek(generated_string)
+#     except:
+#         entire_code = generated_string
+        
+#     # add prompt for pure completion models (for humaneval)
+#     if benchmark == "humaneval":
+#         if 'codegen' in checkpoint_name.lower() or 'codellama' in checkpoint_name.lower():
+#             entire_code = raw_prompt + entire_code
+
+#     return output_sequence, (attention_to_ori_prompt_list_self, attention_to_ori_prompt_list_gradient), entire_code
+
+
+
+
+
+# MAIN beam search
+# keep the top k beams with the highest log probabilities
+# create a funciton used to enhance the logits of the focused word during the decoding process (the generate function)
+def augmented_generate_anchor_beam_search(raw_prompt, raw_masked_prompt, checkpoint_name, model, tokenizer, max_length, device, language, benchmark, weight, output_attentions=True, compute_self_attention=True, compute_gradient=True, adaptive_attention_weight=False, log_path=None, num_beams=10):
+    
+    final_candidates = []  # prepare the final beam candidates
+    
+    # preparation
+    model.eval()
+    ori_weight = weight  # store the original base weight
+    
+    if adaptive_attention_weight:
+        output_attentions = True
+    
+    temp_input_ids_ori = prompt_to_inputs(raw_prompt, tokenizer, checkpoint_name, benchmark, language, device).to(device)
+    temp_input_ids_mask = prompt_to_inputs(raw_masked_prompt, tokenizer, checkpoint_name, benchmark, language, device).to(device)
+    
+    # output the intial prompt
+    print(tokenizer.decode(temp_input_ids_ori[0], skip_special_tokens=False), flush=True)
+    
+    # the beam element as a dictionary
+    intial_beam_element = {
+        "input_ids_ori": temp_input_ids_ori,
+        "input_ids_mask": temp_input_ids_mask,
+        "beam_prob": 1.0,
+        "mask_len": len(temp_input_ids_ori[0]) - len(temp_input_ids_mask[0]) + 1,
+        "init_input_ids_len": len(temp_input_ids_ori[0]),
+        "ori_prompt": tokenizer.decode(temp_input_ids_ori[0], skip_special_tokens=False),
+        "cur_prompt": tokenizer.decode(temp_input_ids_ori[0], skip_special_tokens=False),
+        "pre_prompt": tokenizer.decode(temp_input_ids_ori[0], skip_special_tokens=False),
+        "generated_string": '',
+        "new_tok": '',
+        "attention_to_ori_prompt_list_self": [],
+        "attention_to_ori_prompt_list_gradient": [],
+        "generation_time": 0,
+        "stop_flag": False,
+        "token_prob_list": [],  # used to store the confidence of the generated tokens
+    }
+    
+    # construct beams as a list
+    beams = [intial_beam_element]  # start with 1 initial beam
+    candidates = []  # to buffer k*k candidates
+    
+    with conditional_no_grad(output_attentions):
+        
+        # if the final beam candidates is full, stop the generation process
+        while len(final_candidates) < num_beams:
+            
+            # for each current beam, generate the next token corresponding to multiple candidates
+            for beam_idx in range(len(beams)):
+                # get states in the current beam element
+                input_ids_ori = beams[beam_idx]["input_ids_ori"].to(device)
+                input_ids_mask = beams[beam_idx]["input_ids_mask"].to(device)
+                mask_len = beams[beam_idx]["mask_len"]
+                init_input_ids_len = beams[beam_idx]["init_input_ids_len"]
+                ori_prompt = beams[beam_idx]["ori_prompt"]
+                cur_prompt = beams[beam_idx]["cur_prompt"]
+                pre_prompt = beams[beam_idx]["pre_prompt"]
+                generated_string = beams[beam_idx]["generated_string"]
+                attention_to_ori_prompt_list_self = beams[beam_idx]["attention_to_ori_prompt_list_self"]
+                attention_to_ori_prompt_list_gradient = beams[beam_idx]["attention_to_ori_prompt_list_gradient"]
+                stop_flag = beams[beam_idx]["stop_flag"]
+                generation_time = beams[beam_idx]["generation_time"]
+                token_prob_list = beams[beam_idx]["token_prob_list"]
+                beam_prob = beams[beam_idx]["beam_prob"]
+
+
+                if stop_flag:
+                    final_candidates.append(beams[beam_idx])
+                    continue
+                
+                ## Start generating the next token ##
+                outputs_ori = model(input_ids_ori.to(device), output_attentions=output_attentions)  # inference
+                next_token_logits_ori = outputs_ori.logits[:, -1, :]  # get the logits of original and masked prompt
+                
+                # record attentions of models
+                if output_attentions:
+                    if compute_self_attention:
+                        attention_ori_self = get_self_attention(input_ids_ori, outputs_ori)
+                        attention_sum_self = sum(attention_ori_self[:init_input_ids_len])  # all the original prompt attentions
+                        if attention_sum_self > 1:
+                            attention_sum_self = 1
+                        attention_to_ori_prompt_list_self.append(attention_sum_self)
+                    
+                    if compute_gradient:
+                        attention_ori_gradient = get_gradient_attention(input_ids_ori, model, topk=100)
+                        attention_sum_gradient = sum(attention_ori_gradient[:init_input_ids_len])  # all the original prompt attentions
+                        if attention_sum_gradient > 1:
+                            attention_sum_gradient = 1
+                        attention_to_ori_prompt_list_gradient.append(attention_sum_gradient)
+    
+                
+                if ori_weight != 0:
+                    outputs_mask = model(input_ids_mask.to(device), output_attentions=output_attentions)  # inference
+                    next_token_logits_mask = outputs_mask.logits[:, -1, :]  # get the logits of original and masked prompt
+                            
+                    logit_deviation = (next_token_logits_ori - next_token_logits_mask).detach()
+                    
+                    # Weight is decided based on the attention (if it is adaptive) and given weight
+                    if adaptive_attention_weight:
+                        cur_input_ids_len = len(input_ids_ori[0])  # calculate the current input_ids length for adjusting the weight
+                        weight = (cur_input_ids_len - init_input_ids_len) / mask_len * ori_weight
+                        
+                    next_token_logits_augmented = (next_token_logits_ori + logit_deviation * weight).detach()
+                    # Use Z-score to normalize the logits
+                    next_token_logits_augmented = z_score(next_token_logits_augmented).detach()
+                
+                else:
+                    next_token_logits_augmented = next_token_logits_ori.detach()
+                
+                
+
+                
+                # get the next TOP-k token (beam search)
+                next_token_probs = F.softmax(next_token_logits_augmented, dim=-1)
+                # get the top-k indice
+                top_k_probs, top_k_indices = torch.topk(next_token_probs, k=num_beams, dim=-1)
+                # print('\ntop_k_probs: ', top_k_probs, flush=True)
+                
+                
+                # each current beam derivates num_beams candidate beams in the next step
+                for candidate_idx in range(num_beams):
+                    # get the next token
+                    next_token_idx = top_k_indices[0][candidate_idx].unsqueeze(0)
+
+                    
+
+                    # Ensure input_ids_ori is 2D if it isn't already
+                    if input_ids_ori.dim() == 1:
+                        input_ids_ori = input_ids_ori.unsqueeze(0)
+
+                    # Ensure next_token_idx is 2D and has the same batch dimension as input_ids_ori
+                    if next_token_idx.dim() == 1:
+
+                        next_token_idx = next_token_idx.unsqueeze(0)
+
+                    elif next_token_idx.size(0) != input_ids_ori.size(0):
+                        next_token_idx = next_token_idx.unsqueeze(0).expand(input_ids_ori.size(0), -1)
+
+                    
+                    
+
+
+                    # update the input_ids
+                    candidate_input_ids_ori = torch.cat([input_ids_ori, next_token_idx], dim=-1).detach().to(device)
+                    candidate_input_ids_mask = torch.cat([input_ids_mask, torch.ones_like(next_token_idx)], dim=-1).detach().to(device)
+                    
+
+                    
+                    # print the current prompt
+                    candidate_cur_prompt = tokenizer.decode(candidate_input_ids_ori[0])
+                    
+                    pre_prompt = tokenizer.decode(input_ids_ori[0], skip_special_tokens=False)
+                    candidate_cur_prompt = tokenizer.decode(candidate_input_ids_ori[0])
+                    
+
+                    
+                    candiate_new_tok = candidate_cur_prompt[len(pre_prompt):]
+                    
+                    
+
+                    candidate_generated_string = generated_string + candiate_new_tok
+
+                    new_token_prob = top_k_probs[0][candidate_idx].item()
+                    candidate_token_prob_list = token_prob_list + [new_token_prob]
+                    
+                    # Calculate the log probabilities instead of probabilities
+                    log_prob_list = [math.log(prob) for prob in candidate_token_prob_list]
+                    # Sum the log probabilities and convert back to normal scale by exponentiating
+                    # Normalize by the generation time using exponent of the average log probability
+                    # normalized_beam_prob = math.exp(sum(log_prob_list) / (len(candidate_token_prob_list) + 1))
+                    # calculate the probability by multiplying all token probabilities in candidate_token_prob_list
+
+                    # normalized beam prob is the accumulated multiplication of all token probabilities, root by the generation time
+                    normalized_beam_prob = math.prod(candidate_token_prob_list) ** (1 / (generation_time + 1))
+                    
+                    # add candidate element to candidates
+                    candidate_element = {
+                        "input_ids_ori": candidate_input_ids_ori,
+                        "input_ids_mask": candidate_input_ids_mask,
+                        "beam_prob": normalized_beam_prob,   # this is accumulated multiplication of all token probabilities, but normalizied (increase) to prevent to overflow (equals to 0 after multiplying too many times)
+                        "mask_len": mask_len,
+                        "init_input_ids_len": init_input_ids_len,
+                        "ori_prompt": ori_prompt,
+                        "cur_prompt": candidate_cur_prompt,
+                        "pre_prompt": cur_prompt,
+                        "generated_string": candidate_generated_string,
+                        "new_tok": candiate_new_tok,
+                        "attention_to_ori_prompt_list_self": attention_to_ori_prompt_list_self.copy(),
+                        "attention_to_ori_prompt_list_gradient": attention_to_ori_prompt_list_gradient.copy(),
+                        "stop_flag": next_token_idx[0].item() == tokenizer.eos_token_id or stop_condition(candidate_generated_string, ori_prompt, language, benchmark, checkpoint_name) or other_stop_condition(candiate_new_tok) or max_length <= len(candidate_input_ids_ori[0]),
+                        "generation_time": generation_time + 1,
+                        "token_prob_list": candidate_token_prob_list,
+                    }
+
+                    candidates.append(candidate_element)
+
+            
+            # # normalize the beam_prob to prevent overflow
+            # beam_prob_sum = sum([candidate["beam_prob"] for candidate in candidates])
+            # for candidate in candidates:
+            #     candidate["beam_prob"] = candidate["beam_prob"] / beam_prob_sum   
+            
+            # After processing all candidates, select the top beams
+            # out of k*k candidates, select the top k candidates based on the beam_prob
+            candidates.sort(key=lambda x: x["beam_prob"], reverse=True)
+            beams = copy.deepcopy(candidates[:num_beams])
+            
+            # print the code in each beam
+            # print beam information like candidate
+            for i, beam in enumerate(beams):
+                print(f'\nBeam {i}:', flush=True)
+                print('-' * 45, flush=True)
+                # print based on different models
+                if 'codellama' in checkpoint_name.lower() or 'codegen' in checkpoint_name.lower():
+                    print(raw_prompt + beam["generated_string"], flush=True)
+                else:
+                    print(beam["generated_string"], flush=True)
+                
+            
+            print("\n\n-----==> number in final candidates: ", len(final_candidates), flush=True)
+
+            print('\n')
+            
+            candidates = []
+            
+            # clear GPU memory
+            torch.cuda.empty_cache()
+            gc.collect()
+
+    
+    
+    # get entire codes for each beam
+    output_sequences = []
+    entire_codes = []
+    for final_beam in final_candidates:
+        output_sequence = tokenizer.decode(final_beam["input_ids_ori"][0])
+        output_sequences.append(output_sequence)
+        try:
+            entire_code = get_code_snippets_deepseek(final_beam["generated_string"])
+        except:
+            entire_code = final_beam["generated_string"]
+            
+            
+        # add prompt for pure completion models (for humaneval)
+        if benchmark == "humaneval":
+            if 'codegen' in checkpoint_name.lower() or 'codellama' in checkpoint_name.lower():
+                entire_code = raw_prompt + entire_code    
+        
+        entire_codes.append(entire_code)
+    
+    return output_sequences, entire_codes
+
 
 
 
@@ -3166,9 +3711,6 @@ def augmented_generate_deepseek_instruct_old(raw_prompt, raw_masked_prompt, mode
 
 
 
-
-
-
 # create a funciton used to enhance the logits of the focused word during the decoding process (the generate function)
 def augmented_generate(ori_prompt, masked_prompt, model, tokenizer, max_length, device, task, weight=0.5, log_path=None):
     input_ids_ori = tokenizer.encode(ori_prompt, return_tensors="pt").to(device)
@@ -3318,3 +3860,434 @@ def augmented_generate_parallelly(weighted_prompt, model, tokenizer, max_length,
     output_sequence = tokenizer.decode(input_ids_ori[0])
     
     return output_sequence
+
+
+# given the prompt, mask_tok, and the benchmark, return the masked prompt
+def get_masked_prompt(prompt, mask_tok, benchmark, test_list=''):
+    if benchmark == "humaneval":
+        return mask_humanEval_instruction(prompt, mask_tok=mask_tok)
+    elif benchmark == "mbpp":
+        return mask_tok + '\n'.join(test_list)
+    else:
+        raise ValueError("Undefined benchmark")
+
+
+# #
+
+
+def clean_token(token):
+    """Clean special tokens and characters."""
+    # Skip special model tokens
+    if token.startswith('<|') and token.endswith('|>'):
+        return None
+        
+    # Handle special characters
+    token = (token.replace('Ġ', ' ')  # Replace Ġ with space
+                 .replace('ĉ', '\n')   # Replace ĉ with newline
+                 .replace('Ċ', '\n')   # Replace Ċ with newline
+                 .strip())             # Remove leading/trailing whitespace
+    
+    return token if token else None
+
+def process_attention_dist(attention_dist, text, current_token_idx=None):
+    """
+    Process and clean attention distribution with concrete token indices.
+    current_token_idx: tracks position of current token in the sequence (None for first token)
+    """
+    cleaned_dist = []
+    tokens_with_positions = []
+    current_position = 0
+    token_idx = 0
+    
+    # First pass: collect all valid tokens and their positions
+    for item in attention_dist:
+        cleaned_token = clean_token(item['token'])
+        if cleaned_token:
+            token_pos = text.find(cleaned_token, current_position)
+            if token_pos != -1:
+                tokens_with_positions.append({
+                    'token': cleaned_token,
+                    'position': token_pos,
+                    'attention': float(item['attention']),
+                    'idx': token_idx
+                })
+                current_position = token_pos + len(cleaned_token)
+                token_idx += 1
+    
+    # For generation steps, only include tokens up to the current position
+    if current_token_idx is not None:
+        tokens_with_positions = tokens_with_positions[:current_token_idx+1]
+    
+    # Normalize attention values
+    if tokens_with_positions:
+        attention_values = [item['attention'] for item in tokens_with_positions]
+        max_attention = max(attention_values)
+        min_attention = min(attention_values)
+        attention_range = max_attention - min_attention
+        
+        # Normalize and create final distribution
+        for item in tokens_with_positions:
+            norm_attention = (item['attention'] - min_attention) / attention_range if attention_range > 0 else 1.0
+            cleaned_dist.append({
+                'token': item['token'],
+                'attention': float(norm_attention),
+                'position': item['position'],
+                'idx': item['idx']
+            })
+    
+    return cleaned_dist
+
+
+def map_token_to_word_attention(tokens_with_attention, text):
+    """
+    Convert token-level attention to word-level attention.
+    Returns word-level attention with exact positions and token index ranges.
+    """
+    words = text.split()
+    word_positions = []
+    current_pos = 0
+    
+    # Find the position of each word in the original text
+    for word in words:
+        while current_pos < len(text) and text[current_pos].isspace():
+            current_pos += 1
+        if current_pos < len(text):
+            word_positions.append({
+                'word': word,
+                'start': current_pos,
+                'end': current_pos + len(word),
+                'attention': 0.0,
+                'token_indices': set()  # Store all token indices that overlap with this word
+            })
+            current_pos += len(word)
+
+    # Map token attention to words and track token indices
+    for token_info in tokens_with_attention:
+        token = token_info['token']
+        token_pos = token_info['position']
+        token_attention = token_info['attention']
+        token_idx = token_info['idx']
+        
+        # Find which words this token overlaps with
+        token_end = token_pos + len(token)
+        for word_info in word_positions:
+            # Check if token overlaps with this word
+            if (token_pos < word_info['end'] and token_end > word_info['start']):
+                # Add token index to the word's set of indices
+                word_info['token_indices'].add(token_idx)
+                # Update attention value (take maximum of overlapping tokens)
+                word_info['attention'] = max(word_info['attention'], token_attention)
+
+    # Create final word-level attention distribution
+    word_attention_dist = []
+    for i, word_info in enumerate(word_positions):
+        if word_info['attention'] > 0:  # Only include words with attention
+            token_indices = sorted(list(word_info['token_indices']))
+            word_attention_dist.append({
+                'token': word_info['word'],
+                'attention': float(word_info['attention']),
+                'position': word_info['start'],
+                'idx_range': {
+                    'start': min(token_indices) if token_indices else i,
+                    'end': max(token_indices) if token_indices else i
+                }
+            })
+    
+    return word_attention_dist
+
+def SPA_generate(data, model, tokenizer, special_token, max_new_tokens=1000, use_kv_cache=True, output_attentions=False):
+    
+    TOP_K_CANDIDATES = 5
+    MAX_INPUT_LENGTH = 2048  # Add max input length to prevent OOM
+    
+    submitted_text = data.get("text", "")
+    text_values = data.get("anchors", [])
+
+    messages = [
+        {"role": "system", "content": "You are a helpful assistant!"},
+        {"role": "user", "content": submitted_text},
+    ]
+
+    model.config.use_flash_attention = True
+    
+    # Truncate input if too long
+    inputs = tokenizer.apply_chat_template(
+        messages, add_generation_prompt=True, return_tensors="pt"
+    ).to(model.device)
+    if inputs.shape[1] > MAX_INPUT_LENGTH:
+        inputs = inputs[:, -MAX_INPUT_LENGTH:]
+    
+    weighted_text_augments = []
+    current_sequence = submitted_text  # Keep track of the full sequence for token positions
+    token_count = 0                   # Keep track of number of tokens processed
+
+    # Initialize KV cache and get attention
+    with torch.no_grad():
+        outputs = model(inputs, use_cache=use_kv_cache, output_attentions=output_attentions)
+        past_key_values = outputs.past_key_values if use_kv_cache else None
+        
+        attention_dist = []
+        if output_attentions:
+            attention_weights = outputs.attentions
+            avg_attention = torch.mean(torch.stack(attention_weights), dim=[0,2])
+            last_token_attention = avg_attention[0, -1, :]
+            input_tokens = tokenizer.convert_ids_to_tokens(inputs[0])
+            
+            # Process initial attention distribution
+            attention_dist = process_attention_dist(
+                [{"token": token, "attention": float(attn)} 
+                 for token, attn in zip(input_tokens, last_token_attention)],
+                current_sequence,
+                token_count
+            )
+    
+    # Initialize KV caches for masked inputs
+    for item in text_values:
+        temp_element = {}
+        temp_message = [
+            {"role": "system", "content": "You are a helpful assistant who should provide concise answers."},
+            {"role": "user", "content": item['masked_text']},
+        ]
+        temp_inputs = tokenizer.apply_chat_template(
+            temp_message, add_generation_prompt=True, return_tensors="pt"
+        ).to(model.device)
+        
+        # Truncate masked inputs if too long
+        if temp_inputs.shape[1] > MAX_INPUT_LENGTH:
+            temp_inputs = temp_inputs[:, -MAX_INPUT_LENGTH:]
+            
+        temp_element['inputs'] = temp_inputs
+        temp_element['weight'] = item['value']
+        
+        with torch.no_grad():
+            masked_outputs = model(temp_element['inputs'], use_cache=use_kv_cache)
+            temp_element['past_key_values'] = masked_outputs.past_key_values if use_kv_cache else None
+            
+        weighted_text_augments.append(temp_element)
+
+    for i in range(max_new_tokens):
+
+        with torch.no_grad():
+            model_inputs = {'input_ids': inputs[:, -1:]}
+            if use_kv_cache:
+                model_inputs['past_key_values'] = past_key_values
+                model_inputs['use_cache'] = True
+            
+            outputs = model(**model_inputs, output_attentions=output_attentions)
+            past_key_values = outputs.past_key_values if use_kv_cache else None
+            ori_logits = outputs.logits[:, -1, :]
+            
+            if output_attentions:
+                # Get all input tokens up to current position
+                attention_weights = outputs.attentions
+                avg_attention = torch.mean(torch.stack(attention_weights), dim=[0,2])
+                last_token_attention = avg_attention[0, -1, :]
+                all_tokens = tokenizer.convert_ids_to_tokens(inputs[0])
+                
+                # Update attention distribution with all previous tokens
+                attention_dist = process_attention_dist(
+                    [{"token": token, "attention": float(attn)} 
+                     for token, attn in zip(all_tokens, last_token_attention)],
+                    current_sequence,
+                    token_count
+                )
+            
+            for augment_ele in weighted_text_augments:
+                model_inputs = {'input_ids': augment_ele['inputs'][:, -1:]}
+                if use_kv_cache:
+                    model_inputs['past_key_values'] = augment_ele['past_key_values']
+                    model_inputs['use_cache'] = True
+                
+                masked_outputs = model(**model_inputs)
+                augment_ele['past_key_values'] = masked_outputs.past_key_values if use_kv_cache else None
+                augment_ele['logits'] = masked_outputs.logits[:, -1, :]
+                augment_ele['probs'] = torch.nn.functional.softmax(masked_outputs.logits[:, -1, :], dim=-1)
+                augment_ele['logits_diff'] = (ori_logits - augment_ele['logits']) * augment_ele['weight']
+
+        augmented_logits = ori_logits + sum([augment_ele['logits_diff'] for augment_ele in weighted_text_augments])
+        next_token_probs = torch.nn.functional.softmax(augmented_logits, dim=-1)
+        top_k_probs, top_k_indices = torch.topk(next_token_probs, TOP_K_CANDIDATES)
+        
+        next_token_id = top_k_indices[0, 0].item()
+        next_token = tokenizer.decode(next_token_id)
+
+        confidence_score = next_token_probs[0, next_token_id].item()
+
+        candidates = []
+        for prob, idx in zip(top_k_probs[0], top_k_indices[0]):
+            if prob.item() > 0.01:
+                candidates.append({
+                    'token': tokenizer.decode(idx.item()),
+                    'probability': prob.item()
+                })
+
+        if next_token_id == tokenizer.eos_token_id:
+            break
+
+        # Update the current sequence and token count
+        current_sequence += next_token
+        token_count += 1
+
+        # Convert token-level attention to word-level attention if attention is enabled
+        word_attention_dist = attention_dist if output_attentions else []
+        
+        response_data = {
+            'token': next_token,
+            'confidence': confidence_score,
+            'candidates': candidates,
+            'attention_dist': word_attention_dist  # Use word-level attention if enabled
+        }
+        yield response_data
+
+        inputs = torch.cat([inputs, torch.tensor([[next_token_id]]).to(model.device)], dim=-1)
+        for augment_ele in weighted_text_augments:
+            augment_ele['inputs'] = torch.cat([augment_ele['inputs'], torch.tensor([[next_token_id]]).to(model.device)], dim=-1)
+            augment_ele['logits'] = None
+            augment_ele['probs'] = None
+            augment_ele['logits_diff'] = None
+
+    model.config.use_flash_attention = False
+
+
+# get the entire generation result
+def get_SPA_generation(data, model, tokenizer, special_token="<|reserved_special_token_0|>", max_new_tokens=500):
+    response = ""
+    for chunk in SPA_generate(data, model, tokenizer, special_token, max_new_tokens):
+        if 'token' in chunk.keys():
+            # print(chunk)
+            response += chunk['token']
+    return response
+
+# base SPA that anchors the entire initial prompt as anchors
+# Given a prompt, return the formatted data for SPA generation
+def get_base_spa_input(prompt, weight, special_token):
+    return {
+        'text': prompt,
+        'anchors': [{'text': prompt, 'value': weight, 'masked_text': special_token}]
+    }
+
+
+
+
+# define the SPA generation pipeline for different benchmarks
+def eval_spa_pipeline(benchmark, weight, model, tokenizer, special_token, prompt, **kwargs):
+    
+    if benchmark == "truthfulqa":
+        
+        if weight == 0:
+            # get input data without anchors
+            data = {
+                'text': prompt,
+                'anchors': []
+            }
+
+
+        else:
+            # get input data with anchors
+            data = get_base_spa_input(prompt, weight, special_token)
+            
+
+            
+    elif benchmark == "boolq":
+        if weight == 0:
+            # get input data without anchors
+            data = {
+                'text': prompt,
+                'anchors': []
+            }
+
+
+        else:
+
+            # get the context from the additional arguments
+            context = kwargs['context']
+            question = kwargs['question']
+            # get input data with anchors
+            # replace the context with masked token
+            masked_prompt = prompt.replace(context, special_token).replace(question, special_token)
+
+            data = {
+                'text': prompt,
+                'anchors': [{'masked_text': masked_prompt, 'value': weight}]
+            }
+
+
+
+    elif benchmark == "mmlu":
+        if weight == 0:
+            # get input data without anchors
+            data = {
+                'text': prompt,
+                'anchors': []
+            }
+
+        else:
+            # get the context from the additional arguments
+            question = kwargs['question']
+            choices = kwargs['choices']
+
+            masked_prompt = prompt.replace(question, special_token).replace(str(choices), special_token)
+
+            data = {
+                'text': prompt,
+                'anchors': [{'masked_text': masked_prompt, 'value': weight}]
+            }
+    
+    elif benchmark == "gsm8k":
+        if weight == 0:
+            # get input data without anchors
+            data = {
+                'text': prompt,
+                'anchors': []
+            }
+        else:
+            # get the context from the additional arguments
+            question = kwargs['question']
+            # get input data with anchors
+            masked_prompt = prompt.replace(question, special_token)
+            data = {
+                'text': prompt,
+                'anchors': [{'masked_text': masked_prompt, 'value': weight}]
+            }
+            
+    elif benchmark == "bird":
+        if weight == 0:
+            # get input data without anchors
+            data = {
+                'text': prompt,
+                'anchors': []
+            }
+        else:
+            question = kwargs['question']
+            # get input data with anchors
+            masked_prompt = prompt.replace(question, special_token)
+            data = {
+                'text': prompt,
+                'anchors': [{'masked_text': masked_prompt, 'value': weight}]
+            }
+    
+    elif benchmark == "humaneval":
+        if weight == 0:
+            # get input data without anchors
+            data = {
+                'text': prompt,
+                'anchors': []
+            }
+        else:
+            code_to_complete = kwargs['code_to_complete']
+            # get input data with anchors
+            masked_prompt = prompt.replace(code_to_complete, special_token)
+            data = {
+                'text': prompt,
+                'anchors': [{'masked_text': masked_prompt, 'value': weight}]
+            }
+    
+    
+    # print everything
+    print('-'*100, flush=True)
+    print(data, flush=True)
+    print('-'*100, flush=True)
+    
+    response = get_SPA_generation(data, model, tokenizer, special_token=special_token, max_new_tokens=len(prompt)+500)
+    
+    return response
