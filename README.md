@@ -36,17 +36,25 @@ Run the following command:
 
 ## How to run
 
-Run **anchor_evaluation.py** with corresponding arguments for evaluation.
+Run **anchor_evaluation.py** with the corresponding arguments for evaluation.
 
 For example: 
 
   ``python anchor_evaluation.py --benchmark humaneval --checkpoint deepseek-ai/deepseek-coder-6.7b-instruct --mode instruction --note example --task_id 0 --weight 0.275``.
 
 
-# APIs and demos are on the way!!
+# A cleaned repo, public APIs, and demos are on the way!!
 
-1. General huggingface API
-2. PyPI libraries
-3. A website including static examples and a live demo
+### Repo
+A fully refactored repository, including a cleaner and more optimized implementation.
 
-*Expected in the late May, 2025 ...... *
+
+### APIs
+- General huggingface API (model.generate())
+- Huggingface pipeline API
+- PyPI libraries
+
+### Demos
+- A website including static examples and a live demo
+
+***Expected in late May 2025...***
