@@ -47,13 +47,10 @@ For example:
 
 ### Repo
 A fully refactored repository, including a cleaner and more optimized implementation.
-
-
 ### APIs
 - General huggingface API (model.generate())
 - Huggingface pipeline API
 - PyPI libraries
-
 ### Demos
 - A website including static examples and a live demo
 
