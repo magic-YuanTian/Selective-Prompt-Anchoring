@@ -54,7 +54,7 @@ A fully **refactored** and **optimized** codebase with a cleaner and more optimi
 ### 🔌 Public APIs
 Seamlessly integrate with:
 - 🤗 **Hugging Face's** `model.generate()` API  
-- 🤗 Hugging Face **`pipeline` API**  
+- 🤗 **Hugging Face's** `pipeline` API 
 - Published **PyPI libraries** for easy installation and use
 
 ### 🌐 Demos
