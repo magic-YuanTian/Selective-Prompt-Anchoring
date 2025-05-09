@@ -49,4 +49,4 @@ For example:
 2. PyPI libraries
 3. A website including static examples and a live demo
 
-*Expected in the late May, 2025*
+*Expected in the late May, 2025 ...... *
