@@ -43,15 +43,22 @@ For example:
   ``python anchor_evaluation.py --benchmark humaneval --checkpoint deepseek-ai/deepseek-coder-6.7b-instruct --mode instruction --note example --task_id 0 --weight 0.275``.
 
 
-# A cleaned repo, public APIs, and demos are on the way!!
 
-### Repo
-A fully refactored repository, including a cleaner and more optimized implementation.
-### APIs
-- General huggingface API (model.generate())
-- Huggingface pipeline API
-- PyPI libraries
-### Demos
-- A website including static examples and a live demo
+# 🚀 Coming Soon: Cleaned Repo, Public APIs & Live Demos!
 
-***Expected in late May 2025...***
+The following updates are expected in **late May 2025**!
+
+### 📦 Repository
+A fully **refactored** and **optimized** codebase with a cleaner and more optimized implementation.
+
+### 🔌 Public APIs
+Seamlessly integrate with:
+- 🤗 **Hugging Face's** `model.generate()` API  
+- 🤗 Hugging Face **`pipeline` API**  
+- Published **PyPI libraries** for easy installation and use
+
+### 🌐 Demos
+- A website with curated **static examples**
+- A **live demo** to try SPA out in real time!
+
+Stay tuned & star the repo ⭐ to get notified!
