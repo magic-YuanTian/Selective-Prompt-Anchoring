@@ -43,3 +43,10 @@ For example:
   ``python anchor_evaluation.py --benchmark humaneval --checkpoint deepseek-ai/deepseek-coder-6.7b-instruct --mode instruction --note example --task_id 0 --weight 0.275``.
 
 
+# APIs and demos are on the way!!
+
+1. General huggingface API
+2. PyPI libraries
+3. A website including static examples and a live demo
+
+*Expected in the late May, 2025*
