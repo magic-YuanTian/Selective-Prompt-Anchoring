@@ -117,7 +117,7 @@ print(generated_text)
 ## 📝 Input Formats
 
 Our code supports multiple input formats, allowing developers to conveniently represent anchors in prompts or messages. Developers can use inline paired tags, `<anchor> </anchor>`, or a global anchor list to denote anchored text. 
-They can also work with chat messages in a list, following OpenAI API standards, or simply use a prompt string.
+They can also work with chat messages in a list, following the [OpenAI API standard](https://huggingface.co/docs/text-generation-inference/en/messages_api), or simply use a prompt string.
 
 ### 1️⃣ Single String with Global Anchors
 
