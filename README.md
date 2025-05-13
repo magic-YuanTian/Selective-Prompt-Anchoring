@@ -24,13 +24,21 @@ During token generation, SPA compares logits from both paths and adjusts final p
 
 ## 💻 Installation
 
+### From PyPI *(Recommended)*
+
+```bash
+pip install anchoring
+```
+
+### From Source
+
 ```bash
 # Clone the repository
 git clone https://github.com/your-username/selective-prompt-anchoring.git
 cd selective-prompt-anchoring
 
 # Install dependencies
-pip install torch transformers
+pip install -e .
 ```
 
 ## ⚡ Quick Start with Pipeline
@@ -39,10 +47,7 @@ The pipeline API provides a simple & general interface for using SPA:
 
 ```python
 from transformers import pipeline
-from spa_pipeline import register_spa_pipeline
-
-# Register the SPA pipeline
-register_spa_pipeline()
+import anchoring  # The pipeline is automatically registered on import
 
 # Create pipeline
 spa_pipe = pipeline(
@@ -79,7 +84,7 @@ print()
 ```python
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from spa import SPALogitsProcessor, spa_tokenize
+from anchoring import SPALogitsProcessor, spa_tokenize
 
 # Load model and tokenizer
 model_name = "meta-llama/Llama-3.1-8B-Instruct"
@@ -92,7 +97,7 @@ prompt = "How is the weather today?"
 
 # Tokenize with SPA
 main_inputs, aux_inputs, mask_token = spa_tokenize(
-    prompt_with_anchors=prompt_with_anchors,
+    prompt_with_anchors=prompt,
     global_anchors=global_anchors,
     tokenizer=tokenizer,
     device=model.device
@@ -268,9 +273,12 @@ If you use SPA in your research, please cite:
 
 ```
 @misc{selective-prompt-anchoring,
-  author = {Yuan Tian, Tianyi Zhang},
+  author = {Yuan Tian and Tianyi Zhang},
   title = {Selective Prompt Anchoring for Code Generation},
   year = {2025},
-  conference={ICML'25},
+  booktitle = {Proceedings of the 42nd International Conference on Machine Learning (ICML)},
+  eprint = {2408.09121},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2408.09121}
 }
 ```
