@@ -1,17 +1,18 @@
 # Selective Prompt Anchoring (SPA)
 
-Selective Prompt Anchoring (SPA) is a model-agnostic algorithm designed for large language models (LLMs) that provides fine-grained control over text generation.
-This is the official repository for the **ICML 2025** paper: [Selective Prompt Anchoring for Code Generation](https://arxiv.org/abs/2408.09121).
+> **📄 Selective Prompt Anchoring (SPA) is a model-agnostic algorithm designed for large language models (LLMs) that provides fine-grained control over text generation.**
+>
+> This is the official repository for the **ICML 2025** paper: [Selective Prompt Anchoring for Code Generation](https://arxiv.org/abs/2408.09121).
 
-## Why use SPA?
+## 🤔 Why use SPA?
 
 In human communication, nuanced emphasis and fine-grained implications are often conveyed through variations in volume, tone, or pauses. Conveying such subtleties in text-based communication with AI is challenging with plain text prompts.
 
-SPA enables users to assign importance, emphasis, or weights to specific parts of input text when prompting language models. SPA brings this capability to text-based AI communication by allowing users to "anchor" (the name is inspired by *anchoring effect* in psychology) certain words or phrases in the prompt, causing the model to pay more attention to them during generation. With SPA, users can flexibly steer LLMs' attention through a general, easy-to-use API.
+✨ SPA enables users to assign importance, emphasis, or weights to specific parts of input text when prompting language models. SPA brings this capability to text-based AI communication by allowing users to "anchor" (the name is inspired by *anchoring effect* in psychology) certain words or phrases in the prompt, causing the model to pay more attention to them during generation. With SPA, users can flexibly steer LLMs' attention through a general, easy-to-use API.
 
-While we currently work on text-to-text generation and evaluating on code generation in our paper, the concept can be applied to other tasks (e.g., classification) or with other modalities (image).
+🔍 While we currently work on text-to-text generation and evaluating on code generation in our paper, the concept can be applied to other tasks (e.g., classification) or with other modalities (image).
 
-## Installation
+## 💻 Installation
 
 ```bash
 # Clone the repository
@@ -22,7 +23,7 @@ cd selective-prompt-anchoring
 pip install torch transformers
 ```
 
-## Quick Start
+## ⚡ Quick Start
 
 ### Using the SPA Pipeline
 
@@ -65,7 +66,7 @@ print()
 ```
 
 
-### Direct Usage with `model.generate()`
+### 🛠️ Alternative: Direct Usage with `model.generate()`
 
 ```python
 import torch
@@ -115,11 +116,11 @@ generated_text = tokenizer.decode(output_sequences[0], skip_special_tokens=True)
 print(generated_text)
 ```
 
-## Input Formats
+## 📝 Input Formats
 
 SPA supports multiple input formats:
 
-### 1. Simple String with Global Anchors
+### 1️⃣ Simple String with Global Anchors
 
 ```python
 prompt = "I am an introverted person. How to describe my personality?"
@@ -127,14 +128,14 @@ global_anchors = ['introverted']
 output = spa_pipe(prompt, anchors=global_anchors)
 ```
 
-### 2. String with Inline Anchors
+### 2️⃣ String with Inline Anchors
 
 ```python
 prompt = "What's the weather <anchor>today</anchor>? Think <anchor>step by step</anchor>."
 output = spa_pipe(prompt)
 ```
 
-### 3. Chat Messages with Message-Level Anchors
+### 3️⃣ Chat Messages with Message-Level Anchors
 
 ```python
 prompt = [
@@ -152,7 +153,7 @@ prompt = [
 output = spa_pipe(prompt)
 ```
 
-### 4. Chat Messages with Inline Anchors
+### 4️⃣ Chat Messages with Inline Anchors
 
 ```python
 prompt = [
@@ -170,7 +171,7 @@ output = spa_pipe(prompt, anchors=['weather'])
 
 
 
-## Key Parameters
+## ⚙️ Key Parameters
 
 ### SPA-Specific Parameters
 
@@ -225,7 +226,7 @@ for output in outputs:
 
 SPA is a model-agnostic algorithm. Our implementation inherits the [Huggingface Transformers](https://github.com/huggingface/transformers) generation API. It *should* work for any LLM. Please follow the documentation on the corresponding [Huggingface model pages](https://huggingface.co/models).
 
-## Best Practices
+## 💡 Best Practices
 
 1. **Anchoring strength**:
    - When you want to increase the model's attention/text emphasis
@@ -234,11 +235,11 @@ SPA is a model-agnostic algorithm. Our implementation inherits the [Huggingface 
        - If you are pursuing an optimal value, you can easily tune this value through grid search on your benchmark. Our experiment demonstrates that this value follows a simple pattern (as value increases, performance first improves, then declines), and it is easy to tune by dozens of examples.
    - For reducing (`0 < anchoring_strength < 1`) or reversing (`anchoring_strength < 0`), please set the value based on your concrete needs.
 
-3. **modulated_by_prob**: We recommend setting `modulated_by_prob=True` for stable results. Set it as False if you aim for precise control or have other development needs.  
+2. **modulated_by_prob**: We recommend setting `modulated_by_prob=True` for stable results. Set it as False if you aim for precise control or have other development needs.  
 
-4. **use_attention_mask**: Set `True` by default for more reliable performance, unless you detect any performance issue, you can set it as `False`, SPA supports a backup masking strategy by special tokens.
+3. **use_attention_mask**: Set `True` by default for more reliable performance, unless you detect any performance issue, you can set it as `False`, SPA supports a backup masking strategy by special tokens.
    
-## How SPA Works
+## 🧩 How SPA Works
 
 SPA creates two parallel processing paths:
 1. The original prompt
@@ -246,11 +247,11 @@ SPA creates two parallel processing paths:
 
 During token generation, SPA compares logits from both paths and adjusts final probabilities based on the anchoring strength, causing the model to emphasize the anchored concepts while maintaining coherent generation.
 
-## License
+## 📜 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Citation
+## 📚 Citation
 
 If you use SPA in your research, please cite:
 
