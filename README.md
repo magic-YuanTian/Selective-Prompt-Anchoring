@@ -166,7 +166,7 @@ output = spa_pipe(prompt, anchors=global_anchors)
 </details>
 
 <details>
-<summary><b>2️⃣ String with Inline Anchors</b></summary>
+<summary>2️⃣ String with Inline Anchors</summary>
 
 ```python
 prompt = "What's the weather <anchor>today</anchor>? Think <anchor>step by step</anchor>."
@@ -175,7 +175,7 @@ output = spa_pipe(prompt)
 </details>
 
 <details>
-<summary><b>3️⃣ Chat Messages with Message-Level Anchors</b></summary>
+<summary>3️⃣ Chat Messages with Message-Level Anchors</summary>
 
 ```python
 prompt = [
@@ -195,7 +195,7 @@ output = spa_pipe(prompt)
 </details>
 
 <details>
-<summary><b>4️⃣ Chat Messages with Inline Anchors</b></summary>
+<summary>4️⃣ Chat Messages with Inline Anchors</summary>
 
 ```python
 prompt = [
