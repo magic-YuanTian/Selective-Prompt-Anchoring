@@ -119,22 +119,27 @@ print(generated_text)
 Our code supports multiple input formats, allowing developers to conveniently represent anchors in prompts or messages. Developers can use inline paired tags, `<anchor> </anchor>`, or a global anchor list to denote anchored text. 
 They can also work with chat messages in a list, following the [OpenAI API standard](https://huggingface.co/docs/text-generation-inference/en/messages_api), or simply use a prompt string.
 
-### 1️⃣ Single String with Global Anchors
+<details>
+<summary>1️⃣ String with Global Anchors</summary>
 
 ```python
 prompt = "I am an introverted person. How to describe my personality?"
 global_anchors = ['introverted']
 output = spa_pipe(prompt, anchors=global_anchors)
 ```
+</details>
 
-### 2️⃣ String with Inline Anchors
+<details>
+<summary>2️⃣ String with Inline Anchors</summary>
 
 ```python
 prompt = "What's the weather <anchor>today</anchor>? Think <anchor>step by step</anchor>."
 output = spa_pipe(prompt)
 ```
+</details>
 
-### 3️⃣ Chat Messages with Message-Level Anchors
+<details>
+<summary>3️⃣ Chat Messages with Message-Level Anchors</summary>
 
 ```python
 prompt = [
@@ -151,8 +156,10 @@ prompt = [
 ]
 output = spa_pipe(prompt)
 ```
+</details>
 
-### 4️⃣ Chat Messages with Inline Anchors
+<details>
+<summary>4️⃣ Chat Messages with Inline Anchors</summary>
 
 ```python
 prompt = [
@@ -167,6 +174,7 @@ prompt = [
 ]
 output = spa_pipe(prompt, anchors=['weather'])
 ```
+</details>
 
 
 
