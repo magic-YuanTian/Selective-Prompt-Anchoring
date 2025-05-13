@@ -26,13 +26,15 @@ During token generation, SPA compares logits from both paths and adjusts final p
 
 ### From PyPI *(Recommended)*
 
+Install directly from PyPI using `pip`:
+
 ```bash
 pip install anchoring
 ```
 
-See details in the [official page](https://pypi.org/project/anchoring/0.1.0/).
+For specific versions or more details, see the [official package page](https://pypi.org/project/anchoring/).
 
-### From Source
+### From Source (Optional)
 
 ```bash
 # Clone the repository
@@ -273,14 +275,14 @@ This project is licensed under the Apache 2.0 License - see the LICENSE file for
 
 If you use SPA in your research, please cite:
 
-```
-@misc{selective-prompt-anchoring,
-  author = {Yuan Tian and Tianyi Zhang},
+```bibtex
+@inproceedings{tian2025spa,
   title = {Selective Prompt Anchoring for Code Generation},
-  year = {2025},
+  author = {Tian, Yuan and Zhang, Tianyi},
   booktitle = {Proceedings of the 42nd International Conference on Machine Learning (ICML)},
+  year = {2025},
+  url = {https://arxiv.org/abs/2408.09121},
   eprint = {2408.09121},
-  archivePrefix = {arXiv},
-  url = {https://arxiv.org/abs/2408.09121}
+  archivePrefix = {arXiv}
 }
 ```
