@@ -159,9 +159,8 @@ They can also work with chat messages in a list, following the [OpenAI API stand
 <summary>1️⃣ String with Global Anchors</summary>
 
 ```python
-prompt = "I am an introverted person. How to describe my personality?"
-global_anchors = ['introverted']
-output = spa_pipe(prompt, anchors=global_anchors)
+prompt = "How is the weather today?"
+global_anchors = ['today']
 ```
 </details>
 
@@ -170,7 +169,6 @@ output = spa_pipe(prompt, anchors=global_anchors)
 
 ```python
 prompt = "What's the weather <anchor>today</anchor>? Think <anchor>step by step</anchor>."
-output = spa_pipe(prompt)
 ```
 </details>
 
@@ -190,7 +188,6 @@ prompt = [
         "anchors": ["today"]
     },
 ]
-output = spa_pipe(prompt)
 ```
 </details>
 
@@ -208,7 +205,6 @@ prompt = [
         "content": "What's the weather <anchor>today</anchor>?"
     },
 ]
-output = spa_pipe(prompt, anchors=['weather'])
 ```
 </details>
 
