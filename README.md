@@ -223,46 +223,24 @@ for output in outputs:
 
 ## Model Compatibility
 
-SPA works with any Hugging Face model compatible with `AutoModelForCausalLM`:
-
-```python
-# Llama models
-model_name = "meta-llama/Llama-3.1-8B-Instruct"
-
-# Mistral models
-model_name = "mistralai/Mistral-7B-Instruct-v0.1"
-
-# Qwen models
-model_name = "Qwen/Qwen3-0.6B"
-
-# Code models
-model_name = "codellama/CodeLlama-7b-hf"
-model_name = "deepseek-ai/deepseek-coder-1.3b-instruct"
-
-# IBM models
-model_name = "ibm-granite/granite-4.0-tiny-preview"
-```
-
-For CUDA devices, SPA automatically applies 4-bit quantization:
-
-```python
-if device == "cuda":
-    model_kwargs["quantization_config"] = BitsAndBytesConfig(
-        load_in_4bit=True,
-    )
-```
+SPA is a model-agnostic algorithm. Our implementation inherits the [Huggingface Transformers](https://github.com/huggingface/transformers) generation API. It *should* work for any LLM. Please follow the documentation on the corresponding [Huggingface model pages](https://huggingface.co/models).
 
 ## Best Practices
 
-1. **Anchoring strength**: Start with values around 1.4-3.0 and adjust as needed.
+1. **Anchoring strength**:
+   - When you want to increase the model's attention/text emphasis
+       - If `modulated_by_prob = True`, you can give a relatively high value of **anchoring strength** (e.g., 20).
+       - If `modulated_by_prob = False`, we recommend a value less than 2.
+       - If you are pursuing an optimal value, you can easily tune this value through grid search on your benchmark. Our experiment demonstrates that this value follows a simple pattern (as value increases, performance first improves, then declines), and it is easy to tune by dozens of examples.
+   - For reducing (`0 < anchoring_strength < 1`) or reversing (`anchoring_strength < 0`), please set the value based on your concrete needs.
 
-2. **Modulated probability**: Set `modulated_by_prob=True` for stable results with high anchoring strength.
+3. **modulated_by_prob**: We recommend setting `modulated_by_prob=True` for stable results. Set it as False if you aim for precise control or have other development needs.  
 
-3. **Combine anchor types**: Mix global anchors and inline anchors for maximum control.
+4. **Combine anchor types**: Mix global anchors and inline anchors for maximum control.
 
-4. **Focused anchoring**: Anchor key concepts rather than many words.
+5. **Focused anchoring**: Anchor key concepts rather than many words.
 
-5. **Model-specific tuning**: Different models may require different anchoring strengths.
+6. **Model-specific tuning**: Different models may require different anchoring strengths.
 
 ## How SPA Works
 
