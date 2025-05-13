@@ -23,7 +23,7 @@ pip install torch transformers
 
 ### Using the SPA Pipeline
 
-The pipeline API provides a simple interface for using SPA:
+The pipeline API provides a simple & general interface for using SPA:
 
 ```python
 from transformers import pipeline
@@ -43,11 +43,24 @@ spa_pipe = pipeline(
 )
 
 # Simple text prompt with global anchors
-prompt = "I am an introverted person. How to describe my personality? Answer in 1 sentence."
-global_anchors = ['introverted']
-output = spa_pipe(prompt, anchors=global_anchors, max_new_tokens=100)
+prompt = "How is the weather today?"
+global_anchors = ['today']
+
+output = spa_pipe(prompt, anchors=global_anchors, max_new_tokens=512)
 print(output["generated_text"])
 ```
+
+### Or you can stream the output
+
+SPA supports streaming for real-time generation:
+
+```python
+# Get streaming output
+for token in spa_pipe(prompt, anchors=global_anchors, max_new_tokens=100, stream=True):
+    print(token, end="", flush=True)
+print()
+```
+
 
 ### Direct Usage with `model.generate()`
 
@@ -62,8 +75,8 @@ tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(model_name, device_map="auto")
 
 # Define anchors and prompt
-global_anchors = ['introverted']
-prompt_with_anchors = "I am an introverted person. How to describe my personality? Answer in 1 sentence."
+global_anchors = ['today']
+prompt = "How is the weather today?"
 
 # Tokenize with SPA
 main_inputs, aux_inputs, mask_token = spa_tokenize(
@@ -152,16 +165,7 @@ prompt = [
 output = spa_pipe(prompt, anchors=['weather'])
 ```
 
-## Streaming Output
 
-SPA supports streaming for real-time generation:
-
-```python
-# Get streaming output
-for token in spa_pipe(prompt, anchors=global_anchors, max_new_tokens=100, stream=True):
-    print(token, end="", flush=True)
-print()
-```
 
 ## Key Parameters
 
