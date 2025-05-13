@@ -214,7 +214,7 @@ prompt = [
 
 ### SPA-Specific Parameters
 
-- `anchoring_strength` (default: 1.4): Controls the influence of anchored text.
+- `strength` (default: 1.4): Controls the influence of anchored text.
   - `1.0`: No effect (normal generation)
   - `0.0`: Completely ignore anchored text
   - `>1.0`: Emphasize anchored text (higher values = stronger emphasis)
@@ -240,23 +240,23 @@ SPA supports all standard Hugging Face generation parameters, such as:
 For more parameters, please check the official [Huggingface Transformers' generation documentation](https://huggingface.co/docs/transformers/en/main_classes/text_generation).
 
 
-## Model Compatibility
+## 🧩 Practical Hyperparameter Settings
 
-SPA is a model-agnostic algorithm. Our implementation inherits the [Huggingface Transformers](https://github.com/huggingface/transformers) generation API. It *should* work for any LLM. Please follow the documentation on the corresponding [Huggingface model pages](https://huggingface.co/models).
-
-## 🧩 Hyperparameter Settings
-
-1. **Anchoring strength**:
+1. `strength` (Anchoring Strength): 
    - When you want to increase the model's attention/text emphasis
        - If `modulated_by_prob = True`, you can give a relatively high value of **anchoring strength** (e.g., 20).
        - If `modulated_by_prob = False`, we recommend a value less than 2.
        - If you are pursuing an optimal value, you can easily tune this value through grid search on your benchmark. Our experiment demonstrates that this value follows a simple pattern (as value increases, performance first improves, then declines), and it is easy to tune by dozens of examples.
    - For reducing (`0 < anchoring_strength < 1`) or reversing (`anchoring_strength < 0`), please set the value based on your concrete needs.
 
-2. **modulated_by_prob**: We recommend setting `modulated_by_prob=True` for stable results. Set it as False if you aim for precise control or have other development needs.  
+2. `modulated_by_prob` (Weight influence by token probabilities): We recommend setting `modulated_by_prob=True` for stable results. Set it as False if you aim for precise control or have other development needs.  
 
-3. **use_attention_mask**: Set `True` by default for more reliable performance, unless you detect any performance issue, you can set it as `False`, SPA supports a backup masking strategy by special tokens.
+3. `use_attention_mask` (whether to use attention mask or just special token masking): Set `True` by default for more reliable performance, unless you detect any performance issue, you can set it as `False`, SPA supports a backup masking strategy by special tokens.
    
+## Model Compatibility
+
+SPA is a model-agnostic algorithm. Our implementation inherits the [Huggingface Transformers](https://github.com/huggingface/transformers) generation API. It should work for **any** LLM in [Huggingface model collections](https://huggingface.co/models). Please follow the corresponding model documentation for detailed instructions.
+
 
 ## 📜 License
 
