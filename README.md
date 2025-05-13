@@ -214,28 +214,30 @@ prompt = [
 
 ### SPA-Specific Parameters
 
-- **`anchoring_strength`** (default: 1.4): Controls the influence of anchored text.
+- `anchoring_strength` (default: 1.4): Controls the influence of anchored text.
   - `1.0`: No effect (normal generation)
   - `0.0`: Completely ignore anchored text
   - `>1.0`: Emphasize anchored text (higher values = stronger emphasis)
   - `<0.0`: Avoid using anchored text (negative values = stronger avoidance)
 
-- **`modulated_by_prob`** (default: True): When True, the anchoring strength is modulated by token probability.
+- `modulated_by_prob` (default: True): When True, the anchoring strength is modulated by token probability.
   - Enable for more stable results, especially with higher anchoring strengths
   - Disable for more precise control at lower strengths
 
-- **`use_attention_mask`** (default: True): When True, uses attention masking for anchor tokens, enhancing the effect of anchoring.
+- `use_attention_mask` (default: True): When True, uses attention masking for anchor tokens, enhancing the effect of anchoring.
 
 ### Standard Generation Parameters
 
-SPA supports all standard Hugging Face generation parameters:
+SPA supports all standard Hugging Face generation parameters, such as:
 
-- **`max_new_tokens`**: Maximum number of tokens to generate
-- **`do_sample`**: Whether to use sampling for generation
-- **`temperature`**: Controls randomness (higher = more random)
-- **`top_p`**: Top-p sampling parameter (nucleus sampling)
-- **`top_k`**: Top-k sampling parameter
-- **`min_new_tokens`**: Minimum number of tokens to generate
+- `max_new_tokens`: Maximum number of tokens to generate
+- `do_sample`: Whether to use sampling for generation
+- `temperature`: Controls randomness (higher = more random)
+- `top_p`: Top-p sampling parameter (nucleus sampling)
+- `top_k`: Top-k sampling parameter
+- `min_new_tokens`: Minimum number of tokens to generate
+
+For more parameters, please check the official [Huggingface Transformers' generation documentation](https://huggingface.co/docs/transformers/en/main_classes/text_generation).
 
 
 ## Model Compatibility
