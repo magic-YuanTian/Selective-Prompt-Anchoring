@@ -1,12 +1,15 @@
 # Selective Prompt Anchoring (SPA)
 
 Selective Prompt Anchoring (SPA) is a model-agnostic algorithm designed for large language models (LLMs) that provides fine-grained control over text generation.
+This is the official repository for ICML'25 paper: Selective Prompt Anchoring for Code Generation.
 
 ## Why use SPA?
 
 In human communication, nuanced emphasis and fine-grained implications are often conveyed through variations in volume, tone, or pauses. Conveying such subtleties in text-based communication with AI is challenging with plain text prompts.
 
 SPA enables users to assign importance, emphasis, or weights to specific parts of input text when prompting language models. SPA brings this capability to text-based AI communication by allowing users to "anchor" (the name is inspired by *anchoring effect* in psychology) certain words or phrases in the prompt, causing the model to pay more attention to them during generation. With SPA, users can flexibly steer LLMs' attention through a general, easy-to-use API.
+
+While we currently work on text-to-text generation and evaluating on code generation in our paper, the concept can be applied to other tasks (e.g., classification) or with other modalities (image).
 
 ## Installation
 
@@ -279,11 +282,10 @@ If you use SPA in your research, please cite:
 
 ```
 @misc{selective-prompt-anchoring,
-  author = {Your Name},
-  title = {Selective Prompt Anchoring (SPA)},
-  year = {2023},
+  author = {Yuan Tian},
+  title = {Selective Prompt Anchoring for Code Generation},
+  year = {2025},
   publisher = {GitHub},
-  journal = {GitHub Repository},
-  howpublished = {\url{https://github.com/your-username/selective-prompt-anchoring}}
+  conference={ICML},
 }
 ```
