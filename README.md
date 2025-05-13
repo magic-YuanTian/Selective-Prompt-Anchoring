@@ -1,6 +1,6 @@
 # Selective Prompt Anchoring (SPA)
 
-> ** Selective Prompt Anchoring (SPA) is a model-agnostic algorithm designed for large language models (LLMs) that provides fine-grained control over text generation.**
+> **Selective Prompt Anchoring (SPA)**  is a model-agnostic algorithm designed for large language models (LLMs) that provides fine-grained control over text generation.**
 >
 > This is the official repository for the 📄 **ICML 2025** paper: [Selective Prompt Anchoring for Code Generation](https://arxiv.org/abs/2408.09121).
 
