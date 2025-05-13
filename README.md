@@ -30,6 +30,8 @@ During token generation, SPA compares logits from both paths and adjusts final p
 pip install anchoring
 ```
 
+See details in the [official page](https://pypi.org/project/anchoring/0.1.0/).
+
 ### From Source
 
 ```bash
