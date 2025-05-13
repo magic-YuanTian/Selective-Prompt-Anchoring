@@ -116,9 +116,10 @@ print(generated_text)
 
 ## 📝 Input Formats
 
-SPA supports multiple input formats:
+Our code supports multiple input formats, allowing developers to conveniently represent anchors in prompts or messages. Developers can use inline paired tags, `<anchor> </anchor>`, or a global anchor list to denote anchored text. 
+They can also work with chat messages in a list, following OpenAI API standards, or simply use a prompt string.
 
-### 1️⃣ Simple String with Global Anchors
+### 1️⃣ Single String with Global Anchors
 
 ```python
 prompt = "I am an introverted person. How to describe my personality?"
