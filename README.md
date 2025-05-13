@@ -67,7 +67,7 @@ spa_pipe = pipeline(
 prompt = "How is the weather today?"
 global_anchors = ['today']
 
-output = spa_pipe(prompt, anchors=global_anchors, max_new_tokens=512)
+output = spa_pipe(prompt, anchors=global_anchors, max_new_tokens=1024)
 print(output["generated_text"])
 ```
 
@@ -77,7 +77,7 @@ SPA supports streaming for real-time generation:
 
 ```python
 # Get streaming output
-for token in spa_pipe(prompt, anchors=global_anchors, max_new_tokens=100, stream=True):
+for token in spa_pipe(prompt, anchors=global_anchors, max_new_tokens=1024, stream=True):
     print(token, end="", flush=True)
 print()
 ```
@@ -123,9 +123,8 @@ output_sequences = model.generate(
     input_ids=main_inputs,
     attention_mask=torch.ones_like(main_inputs),
     logits_processor=[spa_processor],
-    max_new_tokens=100,
-    do_sample=True,
-    temperature=0.7
+    max_new_tokens=1024,
+    do_sample=False,
 )
 
 # Decode and print
@@ -153,7 +152,7 @@ prompts = [
 ]
 
 # Process all prompts
-outputs = spa_pipe(prompts, anchors=['weather'], max_new_tokens=100)
+outputs = spa_pipe(prompts, anchors=['weather'], max_new_tokens=1024)
 for output in outputs:
     print(output["generated_text"])
 ```
