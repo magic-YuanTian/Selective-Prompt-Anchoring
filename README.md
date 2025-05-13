@@ -236,12 +236,8 @@ SPA is a model-agnostic algorithm. Our implementation inherits the [Huggingface 
 
 3. **modulated_by_prob**: We recommend setting `modulated_by_prob=True` for stable results. Set it as False if you aim for precise control or have other development needs.  
 
-4. **Combine anchor types**: Mix global anchors and inline anchors for maximum control.
-
-5. **Focused anchoring**: Anchor key concepts rather than many words.
-
-6. **Model-specific tuning**: Different models may require different anchoring strengths.
-
+4. **use_attention_mask**: Set `True` by default for more reliable performance, unless you detect any performance issue, you can set it as `False`, SPA supports a backup masking strategy by special tokens.
+   
 ## How SPA Works
 
 SPA creates two parallel processing paths:
@@ -263,7 +259,6 @@ If you use SPA in your research, please cite:
   author = {Yuan Tian},
   title = {Selective Prompt Anchoring for Code Generation},
   year = {2025},
-  publisher = {GitHub},
   conference={ICML},
 }
 ```
