@@ -23,9 +23,7 @@ cd selective-prompt-anchoring
 pip install torch transformers
 ```
 
-## ⚡ Quick Start
-
-### Using the SPA Pipeline
+## ⚡ Quick Start with Pipeline
 
 The pipeline API provides a simple & general interface for using SPA:
 
