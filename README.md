@@ -256,7 +256,7 @@ If you use SPA in your research, please cite:
 
 ```
 @misc{selective-prompt-anchoring,
-  author = {Yuan Tian},
+  author = {Yuan Tian, Tianyi Zhang},
   title = {Selective Prompt Anchoring for Code Generation},
   year = {2025},
   conference={ICML},
