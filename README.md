@@ -271,6 +271,6 @@ If you use SPA in your research, please cite:
   author = {Yuan Tian, Tianyi Zhang},
   title = {Selective Prompt Anchoring for Code Generation},
   year = {2025},
-  conference={ICML},
+  conference={ICML'25},
 }
 ```
