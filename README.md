@@ -31,7 +31,7 @@ During token generation, SPA compares logits from both paths and adjusts final p
 
 ## 💻 Installation
 
-### From PyPI *(Recommended)*
+### From PyPI (Recommended)
 
 Install directly from PyPI using `pip`:
 
@@ -41,7 +41,7 @@ pip install anchoring
 
 For specific versions or more details, see the [official package page](https://pypi.org/project/anchoring/).
 
-### From Source (Optional)
+### From Source
 
 ```bash
 # Clone the repository
