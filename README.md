@@ -31,7 +31,7 @@ During token generation, SPA compares logits from both paths and adjusts final p
 
 ## 💻 Installation
 
-### From PyPI (Recommended)
+### From PyPI (⭐️ Recommended)
 
 Install directly from PyPI using `pip`:
 
