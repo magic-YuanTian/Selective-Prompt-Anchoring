@@ -41,14 +41,12 @@ pip install anchoring
 
 For specific versions or more details, see the [official package page](https://pypi.org/project/anchoring/).
 
-### From Source
+### From GitHub
 
 ```bash
-# Clone the repository
 git clone https://github.com/your-username/selective-prompt-anchoring.git
 cd selective-prompt-anchoring
 
-# Install dependencies
 pip install -e .
 ```
 
