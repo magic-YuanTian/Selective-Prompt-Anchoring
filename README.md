@@ -229,7 +229,7 @@ prompt = [
   - `1.0`: No effect (normal generation)
   - `0.0`: Completely ignore anchored text
   - `>1.0`: Emphasize anchored text (higher values = stronger emphasis)
-  - `<0.0`: Avoid using anchored text (negative values = stronger avoidance)
+  - `<0.0`: Reverse the influence of the anchored text (negative values = stronger reversed influence)
 
 - `modulated_by_prob` (default: True): When True, the anchoring strength is modulated by token probability.
   - Enable for more stable results, especially with higher anchoring strengths
