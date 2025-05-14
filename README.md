@@ -52,6 +52,15 @@ cd selective-prompt-anchoring
 pip install -e .
 ```
 
+### From HuggingFace
+
+```
+pip install huggingface_hub
+pip install git+https://github.com/magic-YuanTian/Selective-Prompt-Anchoring.git
+```
+
+Check [this page](https://huggingface.co/DoctorChaos/selective-prompt-anchoring) for more details.
+
 ## ⚡ Quick Start with Pipeline
 
 The pipeline API provides a simple & general interface for using SPA:
