@@ -65,7 +65,7 @@ spa_pipe = pipeline(
     "selective-prompt-anchoring",
     model="meta-llama/Llama-3.1-8B-Instruct",
     anchoring_strength=3.0,
-    modulated_by_prob=False,
+    modulated_by_prob=True,
     use_attention_mask=True,
     device_map="auto"
 )
