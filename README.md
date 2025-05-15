@@ -1,10 +1,10 @@
 <h1 align="center">Selective Prompt Anchoring (SPA)</h1>
 
 <p align="center">
-  <a href="https://arxiv.org/abs/2408.09121"><img src="https://img.shields.io/badge/arXiv-2408.09121-b31b1b.svg" alt="arXiv"></a>
   <a href="https://pypi.org/project/anchoring/"><img src="https://img.shields.io/pypi/v/anchoring.svg" alt="PyPI"></a>
-  <a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" alt="License"></a>
   <a href="https://huggingface.co/DoctorChaos/selective-prompt-anchoring"><img src="https://img.shields.io/badge/🤗%20Hugging%20Face-SPA-yellow" alt="Hugging Face"></a>
+  <a href="https://arxiv.org/abs/2408.09121"><img src="https://img.shields.io/badge/arXiv-2408.09121-b31b1b.svg" alt="arXiv"></a>
+  <a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" alt="License"></a>
 </p>
 
 **Selective Prompt Anchoring (SPA)**  is a model-agnostic algorithm designed for large language models (LLMs) that provides fine-grained control over text generation.
