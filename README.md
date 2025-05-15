@@ -18,7 +18,7 @@ In human communication, nuanced emphasis and fine-grained implications are often
 
 ✨ SPA enables users to assign importance, emphasis, or weights to specific parts of input text when prompting language models. SPA brings this capability to text-based AI communication by allowing users to "anchor" (the name is inspired by *anchoring effect* in psychology) certain words or phrases in the prompt, causing the model to pay more attention to them during generation. With SPA, users can flexibly steer LLMs' attention through a general, easy-to-use API.
 
-🔍 *Note: While we currently work on text-to-text generation and evaluating on code generation in our paper, the concept can be applied to other tasks (e.g., classification) or with other modalities (image).*
+🔍 *Note: While we currently work on text-to-text generation and evaluating on code generation in our paper, the underlying idea can be applied to other tasks (e.g., classification) or with other modalities (image).*
 
 
 ## 💡 How SPA Works
