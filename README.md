@@ -1,4 +1,5 @@
-<h1 align="center">Selective Prompt Anchoring (SPA)</h1>
+<h1 align="center">Selective Prompt Anchoring</h1>
+
 
 <p align="center">
   <a href="https://pypi.org/project/anchoring/"><img src="https://img.shields.io/pypi/v/anchoring.svg" alt="PyPI"></a>
