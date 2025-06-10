@@ -62,7 +62,23 @@ Check [this page](https://huggingface.co/DoctorChaos/selective-prompt-anchoring)
 
 ## ⚡ Quick Start with Pipeline
 
-The pipeline API provides a simple & general interface for using SPA:
+Quick start with pipeline API:
+
+```python
+from transformers import pipeline
+import anchoring
+
+pipe = pipeline(
+    "selective-prompt-anchoring",
+    model="meta-llama/Llama-3.1-8B-Instruct",
+)
+
+output = pipe("How is the weather today?", anchors=['today'])
+print(output["generated_text"])
+```
+
+
+A bit more settings:
 
 ```python
 from transformers import pipeline
