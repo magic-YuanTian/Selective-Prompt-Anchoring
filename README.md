@@ -31,6 +31,9 @@ SPA creates two parallel processing paths:
 
 During token generation, SPA compares logits from both paths and adjusts final probabilities based on the anchoring strength, causing the model to emphasize the anchored concepts while maintaining coherent generation.
 
+![spa](https://github.com/user-attachments/assets/9603d893-570c-49e4-bbd3-cd316e0ab07b)
+
+
 
 ## 💻 Installation
 
