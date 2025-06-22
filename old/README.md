@@ -1,3 +1,5 @@
+# Obsolete
+
 # Selective Prompt Anchoring (SPA)
 
 This repo includes all the code for **S**elective **P**rompt **A**nchoring (SPA). Please check [our paper](https://www.arxiv.org/abs/2408.09121).
@@ -44,21 +46,3 @@ For example:
 
 
 
-# 🚀 Coming Soon: Cleaned Repo, Public APIs & Live Demos!
-
-The following updates are expected in **late May 2025**!
-
-### 📦 Repository
-A fully **refactored** and **optimized** codebase with a cleaner and more optimized implementation.
-
-### 🔌 Public APIs
-Seamlessly integrate with:
-- 🤗 **Hugging Face's** `model.generate()` API  
-- 🤗 **Hugging Face's** `pipeline` API 
-- Published **PyPI libraries** for easy installation and use
-
-### 🌐 Demos
-- A website with curated **static examples**
-- A **live demo** to try SPA out in real time!
-
-Stay tuned & star the repo ⭐ to get notified!
