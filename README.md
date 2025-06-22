@@ -25,11 +25,12 @@ In human communication, nuanced emphasis and fine-grained implications are often
 
 ## 💡 How SPA Works
 
-SPA creates two parallel processing paths:
-1. The original prompt
-2. A modified prompt with anchored tokens masked
+At each step, SPA generates two logit distributions in parallel, based on:
 
-During token generation, SPA compares logits from both paths and adjusts final probabilities based on the anchoring strength, causing the model to emphasize the anchored concepts while maintaining coherent generation.
+1. The user prompt (+ alreadly generated tokens)
+2. The prompt with anchored tokens masked (+ already generated tokens)
+
+Then, SPA compares the two logit distributions and adjusts the final probabilities, where the influence of anchored text is increased. Below figure demonstrates the high-level idea:
 
 ![spa](https://github.com/user-attachments/assets/9603d893-570c-49e4-bbd3-cd316e0ab07b)
 
