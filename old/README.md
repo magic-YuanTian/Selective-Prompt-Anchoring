@@ -1,4 +1,4 @@
-# Obsolete
+# >> Obsolete
 
 # Selective Prompt Anchoring (SPA)
 
