@@ -12,6 +12,8 @@
 
 This is the official repository for the 📄 **ICML 2025** paper: [Selective Prompt Anchoring for Code Generation](https://arxiv.org/abs/2408.09121).
 
+🌐 **Live Demo**: [Try here](http://44.211.226.67:3502/)
+
 ## 🤔 Why use SPA?
 
 In human communication, nuanced emphasis and fine-grained implications are often conveyed through variations in volume, tone, or pauses. Conveying such subtleties in text-based communication with AI is challenging with plain text prompts.
