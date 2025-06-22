@@ -1,2 +1,4 @@
-> **Note:** This was an early implementation and is now **completely obsolete**.  
-> It is retained **for archival purposes only**. Please **do not use or reference** this version.
+## ⚠️ Obsolete Implementation
+
+**This was an early implementation and is now _completely obsolete_.**  
+It is retained **for archival purposes only** — please **do not use or reference** this version.
