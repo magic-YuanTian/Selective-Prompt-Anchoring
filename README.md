@@ -22,6 +22,32 @@ In human communication, nuanced emphasis and fine-grained implications are often
 
 📢 *Note: While we currently work on text-to-text generation and evaluating on code generation in our paper, the underlying idea can be applied to other tasks (e.g., classification) or with other modalities (image).*
 
+In short, SPA allows you to easily steer an LLM's attention by assigning importance values to different parts. Below are several examples:
+
+<details>
+  <summary><b>Click to view attention steering examples by SPA</b></summary>
+
+  <br/>
+
+  **Example 1**
+
+  <img width="1610" alt="fig1" src="https://github.com/user-attachments/assets/1298a919-5d78-4fa7-ac89-daa84a97cd49" />
+
+  <br/>
+
+  **Example 2**
+
+  <img width="1333" alt="fig2" src="https://github.com/user-attachments/assets/6166956d-0a59-48e3-bc44-88da17517080" />
+
+  <br/>
+
+  **Example 3**
+
+  <img width="1336" alt="fig3" src="https://github.com/user-attachments/assets/19b1475d-3177-4c5e-9501-921eff1edb6c" />
+
+</details>
+
+
 
 ## 💡 How SPA Works
 
