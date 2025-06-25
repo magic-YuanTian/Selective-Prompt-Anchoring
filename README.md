@@ -63,7 +63,9 @@ At each step, SPA generates two logit distributions in parallel, based on:
 
 Then, SPA compares the two logit distributions and adjusts the final probabilities, where the influence of anchored text is increased. Below figure demonstrates the high-level idea:
 
-![spa](https://github.com/user-attachments/assets/9603d893-570c-49e4-bbd3-cd316e0ab07b)
+
+![spa](https://github.com/user-attachments/assets/cbeeb203-5619-4c3c-bb48-6ff572048103)
+
 
 
 
