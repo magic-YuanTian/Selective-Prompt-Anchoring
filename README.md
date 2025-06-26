@@ -50,7 +50,7 @@ In short, SPA allows you to easily steer an LLM's attention by assigning importa
 
 </details>
 
-* Note: While we currently work on text-to-text generation and evaluating on code generation in our paper, the underlying idea can be potentially applied to other tasks (e.g., classification) or with other modalities (image).*
+*Note: While we currently work on text-to-text generation and evaluating on code generation in our paper, the underlying idea can be potentially applied to other tasks (e.g., classification) or with other modalities (image).*
 
 
 ## 💡 How SPA Works
