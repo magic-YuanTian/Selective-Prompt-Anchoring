@@ -155,6 +155,8 @@ print()
 
 ### 🛠️ Alternative: Direct Usage with `model.generate()`
 
+***Note**: This option potentially provides more parameters and is more compatible with Huggingface models.*
+
 ```python
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
