@@ -20,12 +20,10 @@ In human communication, nuanced emphasis and fine-grained implications are often
 
 ✨ SPA enables users to assign importance, emphasis, or weights to specific parts of input text when prompting language models. SPA brings this capability to text-based AI communication by allowing users to "anchor" (the name is inspired by *anchoring effect* in psychology) certain words or phrases in the prompt, causing the model to pay more attention to them during generation. With SPA, users can flexibly steer LLMs' attention through a general, easy-to-use API.
 
-📢 *Note: While we currently work on text-to-text generation and evaluating on code generation in our paper, the underlying idea can be applied to other tasks (e.g., classification) or with other modalities (image).*
-
 In short, SPA allows you to easily steer an LLM's attention by assigning importance values to different parts. Below are several examples:
 
 <details>
-  <summary><b>Click to view attention steering examples by SPA</b></summary>
+  <summary><b> 👉 Click to view attention steering examples by SPA</b></summary>
 
   <br/>
 
@@ -52,6 +50,7 @@ In short, SPA allows you to easily steer an LLM's attention by assigning importa
 
 </details>
 
+* Note: While we currently work on text-to-text generation and evaluating on code generation in our paper, the underlying idea can be potentially applied to other tasks (e.g., classification) or with other modalities (image).*
 
 
 ## 💡 How SPA Works
@@ -61,7 +60,7 @@ At each step, SPA generates two logit distributions in parallel, based on:
 1. The user prompt (+ alreadly generated tokens)
 2. The prompt with anchored tokens masked (+ already generated tokens)
 
-Then, SPA compares the two logit distributions and adjusts the final probabilities, where the influence of anchored text is increased. Below figure demonstrates the high-level idea:
+Then, SPA compares the two logit distributions and adjusts the final probabilities, where the influence of anchored text is increased. The following figure demonstrates the high-level idea:
 
 
 ![spa](https://github.com/user-attachments/assets/cbeeb203-5619-4c3c-bb48-6ff572048103)
