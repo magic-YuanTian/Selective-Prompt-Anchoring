@@ -337,7 +337,7 @@ For more parameters, please check the official [Huggingface Transformers' genera
    
 ## Model Compatibility
 
-SPA is a model-agnostic algorithm. Our implementation inherits the [Huggingface Transformers](https://github.com/huggingface/transformers) generation API. It should work for **any** LLM in [Huggingface model collections](https://huggingface.co/models). Please follow the corresponding model documentation for detailed instructions.
+SPA is a **model-agnostic algorithm**. Our implementation inherits the [Huggingface Transformers](https://github.com/huggingface/transformers) generation API. It should work for **any** LLM in [Huggingface model collections](https://huggingface.co/models). Please follow the corresponding model documentation for detailed instructions.
 
 If you have any questions or need support for a specific model, please don't hesitate to submit an issue. We will respond shortly. 😁
 
