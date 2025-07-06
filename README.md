@@ -373,3 +373,9 @@ If you use SPA in your research, please cite:
   archivePrefix = {arXiv}
 }
 ```
+
+## 📬 Contact
+
+- **Email**: [tian211@purdue.edu](mailto:tian211@purdue.edu)  
+- **Website**: [https://yuan-tian.com](https://yuan-tian.com)
+
