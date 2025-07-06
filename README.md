@@ -14,6 +14,19 @@ This is the official repository for the 📄 **ICML 2025** paper: [Selective Pro
 
 🌐 **Live Demo**: [Try here](http://44.211.226.67:3502/)
 
+
+<details>
+  <summary>🖼️ <strong>Poster</strong></summary>
+
+  <br>
+
+  <img src="https://github.com/user-attachments/assets/4d6a7c35-f509-4bb9-95f1-f2be495f0616" alt="ICML Poster" width="100%"/>
+
+</details>
+
+
+
+
 ## 🤔 Why use SPA?
 
 In human communication, nuanced emphasis and fine-grained implications are often conveyed through variations in volume, tone, or pauses. Conveying such subtleties in text-based communication with AI is challenging with plain text prompts.
