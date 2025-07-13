@@ -379,5 +379,5 @@ If you use SPA in your research, please cite:
 ## 📬 Contact
 
 - **Email**: [tian211@purdue.edu](mailto:tian211@purdue.edu)  
-- **Website**: [https://yuan-tian.com](https://yuan-tian.com)
+- **Website**: [yuan-tian.com](https://yuan-tian.com)
 
