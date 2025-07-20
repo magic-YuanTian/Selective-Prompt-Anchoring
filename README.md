@@ -162,10 +162,35 @@ for token in spa_pipe(prompt, anchors=global_anchors, max_new_tokens=1024, strea
 print()
 ```
 
+### Batch processing
+
+```python
+# Define a list of prompts
+prompts = ["What's the weather <anchor>today</anchor>?", "What's the weather <anchor>tomorrow</anchor>?"]
+
+# Or with chat format
+prompts = [
+    [
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "What's the weather <anchor>today</anchor>?"}
+    ],
+    [
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "What's the weather <anchor>tomorrow</anchor>?"}
+    ]
+]
+
+# Process all prompts
+outputs = spa_pipe(prompts, anchors=['weather'], max_new_tokens=1024)
+for output in outputs:
+    print(output["generated_text"])
+```
+
+
 
 ### 🛠️ Alternative: Direct Usage with `model.generate()`
 
-*⭐️ This option potentially supports more parameters and Huggingface models. Recommended for developers.*
+*⭐️ This option is more compatible with Hugging Face API and potentially supports more parameters and models. **Recommended for developers**.*
 
 ```python
 import torch
@@ -214,31 +239,7 @@ generated_text = tokenizer.decode(output_sequences[0], skip_special_tokens=True)
 print(generated_text)
 ```
 
-<details>
-<summary>Batch Processing Examples</summary>
 
-```python
-# Define a list of prompts
-prompts = ["What's the weather <anchor>today</anchor>?", "What's the weather <anchor>tomorrow</anchor>?"]
-
-# Or with chat format
-prompts = [
-    [
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "What's the weather <anchor>today</anchor>?"}
-    ],
-    [
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "What's the weather <anchor>tomorrow</anchor>?"}
-    ]
-]
-
-# Process all prompts
-outputs = spa_pipe(prompts, anchors=['weather'], max_new_tokens=1024)
-for output in outputs:
-    print(output["generated_text"])
-```
-</details>
 
 ## 📝 Input Formats
 
