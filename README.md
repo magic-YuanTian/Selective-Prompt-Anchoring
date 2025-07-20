@@ -339,10 +339,14 @@ For more parameters, please check the official [Huggingface Transformers' genera
        - If you are pursuing an optimal value, you can easily tune this value through grid search on your benchmark. Our experiment demonstrates that this value follows a simple pattern (as value increases, performance first improves, then declines), and it is easy to tune by dozens of examples.
    - For reducing (`0 < anchoring_strength < 1`) or reversing (`anchoring_strength < 0`), please set the value based on your concrete needs.
 
+*Note: In our ICML'25 paper, we place less emphasis on `modulated_by_prob` and focus more on the tuning method to demonstrate the impact of this strength value. For further details, please refer to our paper.*
+
 2. `modulated_by_prob` (Weight influence by token probabilities): We recommend setting `modulated_by_prob=True` for stable results. Set it as False if you aim for precise control or have other development needs.  
 
 3. `use_attention_mask` (whether to use attention mask or just special token masking): Set `True` by default for more reliable performance, unless you detect any performance issue, you can set it as `False`, SPA supports a backup masking strategy by special tokens.
-   
+
+
+
 ## Model Compatibility
 
 SPA is a **model-agnostic algorithm**. Our implementation inherits the [Huggingface Transformers](https://github.com/huggingface/transformers) generation API. It should work for **ANY** LLM from [Huggingface model collections](https://huggingface.co/models). Please follow the corresponding model documentation for detailed instructions.
