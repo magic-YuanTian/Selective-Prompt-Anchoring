@@ -110,8 +110,6 @@ pip install huggingface_hub
 pip install git+https://github.com/magic-YuanTian/Selective-Prompt-Anchoring.git
 ```
 
-Check [this page](https://huggingface.co/DoctorChaos/selective-prompt-anchoring) for more details.
-
 ## ⚡ Quick Start with Pipeline
 
 Quick start with pipeline API:
