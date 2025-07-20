@@ -85,9 +85,9 @@ Then, SPA compares the two logit distributions and adjusts the final probabiliti
 
 ## 💻 Installation
 
-### From PyPI (⭐️ Recommended)
+### From PyPI 
 
-Install directly from PyPI using `pip`:
+ (⭐️ **Recommended**) Install directly from PyPI using `pip`:
 
 ```bash
 pip install anchoring
@@ -191,7 +191,9 @@ for output in outputs:
 
 ### 🛠️ Alternative: Direct Usage with `model.generate()`
 
-*⭐️ This option is more compatible with Hugging Face API and potentially supports more parameters and models. **Recommended for developers**.*
+(⭐️ **Recommended for developers**) 
+
+*This option is more compatible with Hugging Face API and potentially supports more parameters and models.*
 
 ```python
 import torch
