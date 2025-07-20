@@ -165,7 +165,7 @@ print()
 
 ### 🛠️ Alternative: Direct Usage with `model.generate()`
 
-*⭐️ Note: This option potentially supports more parameters and Huggingface models. Recommended for developers.*
+*⭐️ This option potentially supports more parameters and Huggingface models. Recommended for developers.*
 
 ```python
 import torch
