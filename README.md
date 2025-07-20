@@ -99,7 +99,6 @@ For specific versions or more details, see the [official package page](https://p
 ```bash
 git clone https://github.com/your-username/selective-prompt-anchoring.git
 cd selective-prompt-anchoring
-
 pip install -e .
 ```
 
