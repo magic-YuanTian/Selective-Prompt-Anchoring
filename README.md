@@ -33,9 +33,9 @@ This is the official repo for our [ICML 2025 work](https://icml.cc/virtual/2025/
 
 In human communication, nuanced emphasis and fine-grained implications are often conveyed through variations in volume, tone, or pauses. Conveying such subtleties in text-based communication with AI is challenging with plain text prompts.
 
-✨ SPA enables users to assign importance, emphasis, or weights to specific parts of input text when prompting language models. SPA brings this capability to text-based AI communication by allowing users to "anchor" (the name is inspired by *anchoring effect* in psychology) certain words or phrases in the prompt, causing the model to pay more attention to them during generation. With SPA, users can flexibly steer LLMs' attention through a general, easy-to-use API.
+✨ SPA enables users to assign importance, emphasis, or weights to specific parts of input text when prompting LLMs. SPA brings this capability to text-based AI communication by allowing users to *anchor* (the name is inspired by [*Anchoring Effect*](https://en.wikipedia.org/wiki/Anchoring_effect) in psychology) certain words or phrases in the prompt, causing the model to pay more/less/reversed attention to them during generation. With SPA, users can flexibly steer LLMs' attention through the Hugging Face API.
 
-In short, SPA allows you to easily steer an LLM's attention by assigning importance values to different parts. Below are several examples:
+Below are several examples:
 
 <details>
   <summary><b> 👉 Click to view attention steering examples by SPA</b></summary>
