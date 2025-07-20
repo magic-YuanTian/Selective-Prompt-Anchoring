@@ -35,10 +35,9 @@ In human communication, nuanced emphasis and fine-grained implications are often
 
 ✨ SPA enables users to assign importance, emphasis, or weights to specific parts of input text when prompting LLMs. SPA brings this capability to text-based AI communication by allowing users to *anchor* (the name is inspired by [*Anchoring Effect*](https://en.wikipedia.org/wiki/Anchoring_effect) in psychology) certain words or phrases in the prompt, causing the model to pay more/less/reversed attention to them during generation. With SPA, users can flexibly steer LLMs' attention through the Hugging Face API.
 
-Below are several examples:
 
 <details>
-  <summary><b> 👉 Click to view attention steering examples by SPA</b></summary>
+  <summary><b> 👉 Here are some examples</b></summary>
 
   <br/>
 
@@ -169,7 +168,7 @@ print()
 
 ### 🛠️ Alternative: Direct Usage with `model.generate()`
 
-*⭐️ Note: This option potentially supports more parameters and Huggingface models.*
+*⭐️ Note: This option potentially supports more parameters and Huggingface models. Recommended for developers.*
 
 ```python
 import torch
