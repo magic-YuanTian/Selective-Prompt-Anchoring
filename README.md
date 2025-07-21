@@ -29,7 +29,7 @@ This is the official repo for our [ICML 2025 work](https://icml.cc/virtual/2025/
 
 
 
-## 🤔 Why use SPA?
+## Why use SPA? 🤔 
 
 When humans talk with one another, nuanced emphasis and fine-grained implications are often conveyed through different volumes, tones, or pauses. However, there is a gap in conveying such information through text-based communication with AI. Moreover, AI may attend to the wrong parts of the input. We need an efficient mechanism to correct its attention, without reference challenges (i.e., it is hard to reference when the context is repetitive or scattered), and without increasing the context (i.e., simply repeating may not only make the prompt weird but also risk exceeding the context window size).
 
@@ -83,7 +83,7 @@ Then, SPA compares the two logit distributions and adjusts the final probabiliti
 
 
 
-## 💻 Installation
+## Installation 💻 
 
 ### From PyPI 
 
@@ -189,7 +189,7 @@ for output in outputs:
 
 
 
-### 🛠️ Alternative: Direct Usage with `model.generate()`
+### Direct Usage with `model.generate()` 🛠️ 
 
 (⭐️ **Recommended for developers**) 
 
@@ -244,7 +244,7 @@ print(generated_text)
 
 
 
-## 📝 Input Formats
+## Input Formats 📝
 
 Our code supports multiple input formats, allowing developers to conveniently represent anchors in prompts or messages. Developers can use inline paired tags, `<anchor> </anchor>`, or a global anchor list to denote anchored text. 
 They can also work with chat messages in a list, following the [OpenAI API standard](https://huggingface.co/docs/text-generation-inference/en/messages_api), or simply use a prompt string.
@@ -303,7 +303,7 @@ prompt = [
 ### **➡️ Two example usage scripts are included under the [example folder](https://github.com/magic-YuanTian/Selective-Prompt-Anchoring/tree/main/examples)!** 
 
 
-## ⚙️ Key Parameters
+## Hyper-parameters ⚙️ 
 
 ### SPA-Specific Parameters
 
@@ -333,7 +333,7 @@ SPA supports all standard Hugging Face generation parameters, such as:
 For more parameters, please check the official [Huggingface Transformers' generation documentation](https://huggingface.co/docs/transformers/en/main_classes/text_generation).
 
 
-## 🧩 Practical Hyperparameter Settings
+## Practical Hyper-parameter Settings 🧩 
 
 1. `strength` (Anchoring Strength): 
    - When you want to increase the model's attention/text emphasis
@@ -356,11 +356,11 @@ SPA is a **model-agnostic algorithm**. Our implementation inherits the [Huggingf
 
 If you have any questions or need support for a specific model, please don't hesitate to submit an issue. We will respond shortly. 😁
 
-## 📜 License
+## License 📜 
 
 This project is licensed under the Apache 2.0 License - see the LICENSE file for details.
 
-## 📚 Citation
+## Citation 📚
 
 If you use SPA in your research, please cite:
 
@@ -376,7 +376,7 @@ If you use SPA in your research, please cite:
 }
 ```
 
-## 📬 Contact
+## Contact 📬
 
 - **Email**: [tian211@purdue.edu](mailto:tian211@purdue.edu)  
 - **Website**: [yuan-tian.com](https://yuan-tian.com)
