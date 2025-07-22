@@ -14,7 +14,7 @@ This is the official repo for our [ICML 2025 work](https://icml.cc/virtual/2025/
 
 📄 **Paper**: [Selective Prompt Anchoring for Code Generation](https://arxiv.org/abs/2408.09121)
 
-🌐 **Live Demo**: [Try here](http://44.211.226.67:3502/)
+🌐 **Live Demo**: [Try here](http://44.211.226.67:3502/) (Not HTTPS, so it may be restricted by public networks.)
 
 
 <details>
