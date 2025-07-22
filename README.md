@@ -38,7 +38,7 @@ When humans talk with one another, nuanced emphasis and fine-grained implication
 
 
 <details>
-  <summary><b> 👉 Here are some examples</b></summary>
+  <summary><b> 👉 Here are some interesting examples</b></summary>
 
   <br/>
 
