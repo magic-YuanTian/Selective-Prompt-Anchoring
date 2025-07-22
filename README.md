@@ -39,16 +39,12 @@ When humans talk with one another, nuanced emphasis and fine-grained implication
 
 <details>
   <summary><b> 👉 Here are some interesting examples</b></summary>
-
-  <br/>
-
+  
   ### Example 1
  
   <img width="1610" alt="fig1" src="https://github.com/user-attachments/assets/1298a919-5d78-4fa7-ac89-daa84a97cd49" />
 
   <br/>
-
-  
   
   ### Example 2
 
