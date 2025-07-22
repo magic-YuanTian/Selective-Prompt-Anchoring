@@ -65,7 +65,7 @@ When humans talk with one another, nuanced emphasis and fine-grained implication
 
 </details>
 
-*Note: While we currently work on text-to-text generation and evaluating on code generation in our paper, the underlying idea can be potentially applied to other tasks (e.g., classification) or with other modalities (image).*
+*Note: While we currently work on text-to-text generation and evaluating on code generation in our paper, the underlying idea can be potentially applied to other tasks (e.g., classification) or with other modalities (e.g., image).*
 
 
 ## 💡 How SPA Works
