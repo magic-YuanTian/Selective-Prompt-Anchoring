@@ -93,8 +93,6 @@ Then, SPA compares the two logit distributions and adjusts the final probabiliti
 pip install anchoring
 ```
 
-For specific versions or more details, see the [official package page](https://pypi.org/project/anchoring/).
-
 ### From GitHub
 
 ```bash
