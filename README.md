@@ -61,7 +61,7 @@ When humans talk with one another, nuanced emphasis and fine-grained implication
 *Note: While we currently work on text-to-text generation and evaluating on code generation in our paper, the underlying idea can be potentially applied to other tasks (e.g., classification) or with other modalities (e.g., image).*
 
 
-## 💡 How SPA Works
+## How SPA Works 💡 
 
 At each step, SPA generates two logit distributions in parallel, based on:
 
@@ -76,7 +76,7 @@ Then, SPA compares the two logit distributions and adjusts the final probabiliti
 
 
 
-## Installation 💻 
+## Installation 
 
 ### From PyPI 
 
@@ -180,7 +180,7 @@ for output in outputs:
 
 
 
-### Direct Usage with `model.generate()` 🛠️ 
+### Direct Usage with `model.generate()`
 
 (⭐️ **Recommended for developers**) 
 
@@ -235,7 +235,7 @@ print(generated_text)
 
 
 
-## Input Formats 📝
+## Input Formats
 
 Our code supports multiple input formats, allowing developers to conveniently represent anchors in prompts or messages. Developers can use inline paired tags, `<anchor> </anchor>`, or a global anchor list to denote anchored text. 
 They can also work with chat messages in a list, following the [OpenAI API standard](https://huggingface.co/docs/text-generation-inference/en/messages_api), or simply use a prompt string.
@@ -294,7 +294,7 @@ prompt = [
 ### **➡️ Two example usage scripts are included under the [example folder](https://github.com/magic-YuanTian/Selective-Prompt-Anchoring/tree/main/examples)!** 
 
 
-## Hyper-parameters ⚙️ 
+## Hyper-parameters
 
 ### SPA-Specific Parameters
 
@@ -324,7 +324,7 @@ SPA supports all standard Hugging Face generation parameters, such as:
 For more parameters, please check the official [Huggingface Transformers' generation documentation](https://huggingface.co/docs/transformers/en/main_classes/text_generation).
 
 
-## Practical Hyper-parameter Settings 🧩 
+## Practical Hyper-parameter Settings
 
 1. `strength` (Anchoring Strength): 
    - When you want to increase the model's attention/text emphasis
@@ -347,11 +347,11 @@ SPA is a **model-agnostic algorithm**. Our implementation inherits the [Huggingf
 
 If you have any questions or need support for a specific model, please don't hesitate to submit an issue. We will respond shortly. 😁
 
-## License 📜 
+## License
 
 This project is licensed under the Apache 2.0 License - see the LICENSE file for details.
 
-## Citation 📚
+## Citation
 
 If you use SPA in your research, please cite:
 
@@ -367,7 +367,7 @@ If you use SPA in your research, please cite:
 }
 ```
 
-## Contact 📬
+## Contact
 
 - **Email**: [tian211@purdue.edu](mailto:tian211@purdue.edu)  
 - **Website**: [yuan-tian.com](https://yuan-tian.com)
