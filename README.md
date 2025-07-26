@@ -101,9 +101,10 @@ pip install huggingface_hub
 pip install git+https://github.com/magic-YuanTian/Selective-Prompt-Anchoring.git
 ```
 
-## ⚡ Quick Start with Pipeline
 
-Quick start with pipeline API:
+## Quick Start
+
+With pipeline API:
 
 ```python
 from transformers import pipeline
