@@ -31,6 +31,7 @@ This is the official repo for our [<img width="40" height="40" alt="icml" src="h
 
 
 
+<br>
 
 ## Why use SPA? 🤔 
 
@@ -63,6 +64,7 @@ When humans talk with one another, nuanced emphasis and fine-grained implication
 
 *Note: While we currently work on text-to-text generation and evaluating on code generation in our paper, the underlying idea can be potentially applied to other tasks (e.g., classification) or with other modalities (e.g., image).*
 
+<br>
 
 ## How SPA Works 💡 
 
@@ -78,6 +80,7 @@ Then, SPA compares the two logit distributions and adjusts the final probabiliti
 
 
 
+<br>
 
 ## Installation 📦
 
@@ -104,6 +107,7 @@ pip install huggingface_hub
 pip install git+https://github.com/magic-YuanTian/Selective-Prompt-Anchoring.git
 ```
 
+<br>
 
 ## Quick Start ⚡
 
@@ -237,7 +241,7 @@ generated_text = tokenizer.decode(output_sequences[0], skip_special_tokens=True)
 print(generated_text)
 ```
 
-
+<br>
 
 ## Input Formats
 
@@ -298,6 +302,8 @@ prompt = [
 **👉 Two example usage scripts are included under the [example folder](https://github.com/magic-YuanTian/Selective-Prompt-Anchoring/tree/main/examples)!** 
 
 
+<br>
+
 ## Hyper-parameters
 
 ### SPA-Specific Parameters
@@ -327,6 +333,7 @@ SPA supports all standard Hugging Face generation parameters, such as:
 
 For more parameters, please check the official [Huggingface Transformers' generation documentation](https://huggingface.co/docs/transformers/en/main_classes/text_generation).
 
+<br>
 
 ## Practical Hyper-parameter Settings
 
@@ -343,7 +350,7 @@ For more parameters, please check the official [Huggingface Transformers' genera
 
 3. `use_attention_mask` (whether to use attention mask or just special token masking): Set `True` by default for more reliable performance, unless you detect any performance issue, you can set it as `False`, SPA supports a backup masking strategy by special tokens.
 
-
+<br>
 
 ## Compatibility
 
@@ -351,9 +358,13 @@ SPA is a **model-agnostic algorithm**. Our implementation inherits the [Huggingf
 
 If you have any questions or need support for a specific model, please don't hesitate to submit an issue. We will respond shortly. 😁
 
+<br>
+
 ## License
 
 This project is licensed under the Apache 2.0 License - see the LICENSE file for details.
+
+<br>
 
 ## Citation
 
@@ -370,6 +381,8 @@ If you find SPA useful, you could cite by
   archivePrefix = {arXiv}
 }
 ```
+
+<br>
 
 ## Contact
 
