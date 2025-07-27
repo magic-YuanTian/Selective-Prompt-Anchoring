@@ -360,11 +360,6 @@ If you have any questions or need support for a specific model, please don't hes
 
 <br>
 
-## License
-
-This project is licensed under the Apache 2.0 License - see the LICENSE file for details.
-
-<br>
 
 ## Citation
 
