@@ -295,7 +295,7 @@ prompt = [
 
 
 
-### **➡️ Two example usage scripts are included under the [example folder](https://github.com/magic-YuanTian/Selective-Prompt-Anchoring/tree/main/examples)!** 
+**👉 Two example usage scripts are included under the [example folder](https://github.com/magic-YuanTian/Selective-Prompt-Anchoring/tree/main/examples)!** 
 
 
 ## Hyper-parameters
