@@ -79,11 +79,11 @@ Then, SPA compares the two logit distributions and adjusts the final probabiliti
 
 
 
-## Installation 
+## Installation 📦
 
 ### From PyPI 
 
- (⭐️ **Recommended**) Install directly from PyPI using `pip`:
+ (**Recommended**) Install directly from PyPI using `pip`:
 
 ```bash
 pip install anchoring
@@ -105,7 +105,7 @@ pip install git+https://github.com/magic-YuanTian/Selective-Prompt-Anchoring.git
 ```
 
 
-## Quick Start
+## Quick Start ⚡
 
 With pipeline API:
 
@@ -186,7 +186,7 @@ for output in outputs:
 
 ### Direct Usage with `model.generate()`
 
-(⭐️ **Recommended for developers**) 
+(**Recommended for developers**) 
 
 *This option is more compatible with Hugging Face API and potentially supports more parameters and models.*
 
