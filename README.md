@@ -345,7 +345,7 @@ For more parameters, please check the official [Huggingface Transformers' genera
 
 
 
-## Model Compatibility
+## Compatibility
 
 SPA is a **model-agnostic algorithm**. Our implementation inherits the [Huggingface Transformers](https://github.com/huggingface/transformers) generation API. It should work for **ANY** LLM from [Huggingface model collections](https://huggingface.co/models). Please follow the corresponding model documentation for detailed instructions.
 
@@ -357,7 +357,7 @@ This project is licensed under the Apache 2.0 License - see the LICENSE file for
 
 ## Citation
 
-If you use SPA in your research, please cite:
+If you find SPA useful, you could cite by
 
 ```bibtex
 @inproceedings{tian2025spa,
