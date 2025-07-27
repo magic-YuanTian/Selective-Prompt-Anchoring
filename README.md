@@ -13,7 +13,7 @@
 
 
 
-This is the official repo for our <img width="40" height="40" alt="icml" src="https://github.com/user-attachments/assets/01ffbec2-4026-410f-9c02-3895daeee27c" />  [ICML 2025 work](https://icml.cc/virtual/2025/poster/44812).
+This is the official repo for our [<img width="40" height="40" alt="icml" src="https://github.com/user-attachments/assets/01ffbec2-4026-410f-9c02-3895daeee27c" /> ICML 2025 work](https://icml.cc/virtual/2025/poster/44812).
 
 📄 **Paper**: [Selective Prompt Anchoring for Code Generation](https://arxiv.org/abs/2408.09121)
 
