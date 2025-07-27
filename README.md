@@ -147,7 +147,7 @@ output = spa_pipe(prompt, anchors=global_anchors, max_new_tokens=1024)
 print(output["generated_text"])
 ```
 
-### You can also stream the output
+### You can also stream the generation
 
 SPA supports streaming for real-time generation:
 
