@@ -90,7 +90,8 @@ Then, SPA compares the two logit distributions and adjusts the final probabiliti
 
 ```bash
 pip install anchoring
-# pip install accelerate
+
+# pip install accelerate (Sometimes need to do this after the first command)
 ```
 
 ### From GitHub
