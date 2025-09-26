@@ -319,8 +319,11 @@ prompt = [
 - `modulated_by_prob` (default: True): When True, the anchoring strength is modulated by token probability.
   - Enable for more stable results, especially with higher anchoring strengths
   - Disable for more precise control at lower strengths
+  - Hint: Set this as `False` to reproduce the paper settings
 
-- `use_attention_mask` (default: True): When True, uses attention masking for anchor tokens, enhancing the effect of anchoring.
+- `use_attention_mask` (default: True): When True, uses attention masking for anchor tokens, enhancing the effectiveness of anchoring.
+  - If you observe unexpected behavior, set this as `False`
+  - Hint: Set this as `False` to reproduce the paper setting
 
 ### Standard Generation Parameters
 
