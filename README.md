@@ -17,7 +17,7 @@ This is the official repo for our [<img width="40" height="40" alt="icml" src="h
 
 📄 **Paper**: [Selective Prompt Anchoring for Code Generation](https://arxiv.org/abs/2408.09121)
 
-🌐 **Live Demo**: [Try here](http://18.207.218.62:3502/) (Not HTTPS, so might be restricted by public networks.)
+🌐 **Live Demo**: [Try here](https://hcss.cs.purdue.edu/spa)
 
 
 <details>
