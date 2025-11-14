@@ -1,391 +1,468 @@
-<h1 align="center">Selective Prompt Anchoring</h1>
-
-
+<h1 align="center">SQLsynth</h1>
 <p align="center">
-  <a href="https://pypi.org/project/anchoring/"><img src="https://img.shields.io/pypi/v/anchoring.svg" alt="PyPI"></a>
-  <a href="https://huggingface.co/DoctorChaos/selective-prompt-anchoring"><img src="https://img.shields.io/badge/🤗%20Hugging%20Face-SPA-yellow" alt="Hugging Face"></a>
-  <a href="https://arxiv.org/abs/2408.09121"><img src="https://img.shields.io/badge/arXiv-2408.09121-b31b1b.svg" alt="arXiv"></a>
-  <a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" alt="License"></a>
+  <em>Text-to-SQL Domain Adaptation via Human-LLM Collaborative Data Annotation</em>
 </p>
 
-**Selective Prompt Anchoring (SPA)**  is a model-agnostic algorithm designed for large language models (LLMs) that provides fine-grained control over text generation.
+<p align="center">
+  <a href="https://arxiv.org/abs/2502.15980"><img src="https://img.shields.io/badge/arXiv-2408.09121-b31b1b.svg" alt="arXiv"></a>
+  <a href="https://dl.acm.org/doi/10.1145/3708359.3712083"><img src="https://img.shields.io/badge/ACM-IUI'25-0085CA.svg" alt="ACM"></a>
+</p>
+
+<img width="1000"  alt="teaser" src="https://github.com/user-attachments/assets/cfb9613e-abfb-48cb-9b48-1525c003ec07" />
 
 
+This is the repo for IUI'25 paper, [Text-to-SQL Domain Adaptation via Human-LLM Collaborative Data Annotation](https://arxiv.org/abs/2502.15980).
 
-
-This is the official repo for our [<img width="40" height="40" alt="icml" src="https://github.com/user-attachments/assets/01ffbec2-4026-410f-9c02-3895daeee27c" /> ICML 2025 work](https://icml.cc/virtual/2025/poster/44812).
-
-📄 **Paper**: [Selective Prompt Anchoring for Code Generation](https://arxiv.org/abs/2408.09121)
-
-🌐 **Live Demo**: [Try here](https://hcss.cs.purdue.edu/spa)
-
-
-<details>
-  <summary>🖼️ <strong>Poster</strong></summary>
-
-  <br>
-
-  <img src="https://github.com/user-attachments/assets/4d6a7c35-f509-4bb9-95f1-f2be495f0616" alt="ICML Poster" width="100%"/>
-
-</details>
-
-
-
-<br>
-
-## Why use SPA? 🤔 
-
-When humans talk with one another, nuanced emphasis and fine-grained implications are often conveyed through different volumes, tones, or pauses. However, there is a gap in conveying such information through text-based communication with AI. Moreover, AI may attend to the wrong parts of the input. We need an efficient mechanism to correct its attention, without reference challenges (i.e., it is hard to reference when the context is repetitive or scattered), and without increasing the context (i.e., simply repeating may not only make the prompt weird but also risk exceeding the context window size).
-
-
-✨ SPA enables users to assign importance, emphasis, or weights to specific parts of input text when prompting LLMs. SPA brings this capability to text-based AI communication by allowing users to *anchor* (the name is inspired by [anchoring effect](https://en.wikipedia.org/wiki/Anchoring_effect) in psychology) certain words or phrases in the prompt, causing the model to pay more/less/reversed attention to them during generation. With SPA, users can flexibly steer LLMs' attention through the Hugging Face API.
-
-
-<details>
-  <summary><b> 👉 Here are some interesting examples</b></summary>
+- *Note: This repo serves as the latest and backup version of the [official Adobe repo](https://github.com/adobe/nl_sql_analyzer).*
   
-  ### Example 1
- 
-  <img width="1610" alt="fig1" src="https://github.com/user-attachments/assets/1298a919-5d78-4fa7-ac89-daa84a97cd49" />
-
-  <br/>
-  
-  ### Example 2
-
-  <img width="1333" alt="fig2" src="https://github.com/user-attachments/assets/6166956d-0a59-48e3-bc44-88da17517080" />
-
-  <br/>
-
-  ### Example 3
-
-  <img width="1336" alt="fig3" src="https://github.com/user-attachments/assets/19b1475d-3177-4c5e-9501-921eff1edb6c" />
-
-</details>
-
-*Note: While we currently work on text-to-text generation and evaluating on code generation in our paper, the underlying idea can be potentially applied to other tasks (e.g., classification) or with other modalities (e.g., image).*
-
-<br>
-
-## How SPA Works 💡 
-
-At each step, SPA generates two logit distributions in parallel, based on:
-
-1. The user prompt (+ alreadly generated tokens)
-2. The prompt with anchored tokens masked (+ already generated tokens)
-
-Then, SPA compares the two logit distributions and adjusts the final probabilities, where the influence of anchored text is increased. The following figure demonstrates the high-level idea:
+SQLsynth is not only an **interactive data annotation** but also **automated data synthesis** tool designed for quickly creating highly customized (e.g., schema, DB records, distribution) text-to-SQL datasets. 
 
 
-![spa](https://github.com/user-attachments/assets/cbeeb203-5619-4c3c-bb48-6ff572048103)
+## 🌟 Features
+
+- **Database Schema Customization**
+  - Freely create, edit, annotate (use NL to label the semantics of database fields, useful for LLMs) in the canvas.
+  - 📦 --> A highly customized database schema, with meaningful descriptions
+- **Database Records Population**
+  - Given a database schema, populate it with concrete records
+  - Rule-based method (No LLM calling)
+  - Recognized for different datatype
+  - Distribution is configurable
+  - 📦 --> A complete, customized database full of records
+- **SQL Query Sampling**
+  - Given a database, randomly sample SQL queries.
+  - Based on PCFG (Probability Context-Free Grammar) and other rules to extract records from a specified database.
+  - The probability distribution is configurable (e.g., increase the number of queries with WHERE clauses or those involving a specific column).
+  - Syntax is customizable (e.g., support for user-defined SQL dialect).
+  - 📦 --> A large amount of SQL queries (with a customized distribution) under the provided database
+- **SQL-to-Text Generation**
+  - Convert SQL queries into NL questions
+  - Three stages:
+    1. Convert the SQL query into step-by-step NL explanations by a [grammar-based method](https://github.com/magic-YuanTian/STEPS).
+    2. Conduct in-context on specified real-world data for style adaptation
+    3. Generating the NL question by LLMs
+  - 📦 --> A large amount of (NL, SQL) pairs under the customized database, where NL questions may be perfect (ambiguous, lack details, etc.)
+- **Text-SQL Alignment**:
+  - Mapping NL components (substrings) to SQL compoenents (clauses)
+  - Error checking for generated NL (note that the SQL is absolutely correct)
+  - Use to analyze (1) what information may be missing (the SQL component fails to map to NL components), and (2) what information may be redundant (the NL component doesn't map to any SQL compoenent)
+  - Interactively highlight by visual correspondence in the UI
+  - 📦 --> A large amount of *reliable* (NL, SQL) pairs under the customized database
+- **Dataset statistics & visualization**:
+  - Upload and analyze existing SQL query datasets
+  - Assist users in tracking datasets from a dataset-level perspective
+  - Comprehensive statistics dashboard with summary metrics (total queries, unique keywords, average complexity),including:
+    - SQL structure distribution
+    - Keyword frequency distribution
+    - Clause number distribution
+    - Column and table usage patterns
+    - Query complexity distribution
+    - Reference value distribution
+  - 📦 --> Insights into dataset characteristics and qualities
 
 
+<img width="2000" alt="overview" src="https://github.com/user-attachments/assets/538533f8-eebc-42f0-8f80-2822fb707847" />
 
-<br>
 
-## Installation 📦
+## 🚀 Installation
 
-### From PyPI 
+### Backend Setup
 
- (**Recommended**) Install directly from PyPI using `pip`:
-
+1. Clone the repository:
 ```bash
-pip install anchoring
-
-# pip install accelerate (Sometimes need to do this after the first command)
+git clone https://github.com/yourusername/SQLsynth.git
+cd SQLsynth
 ```
 
-### From GitHub
-
+2. Install Python dependencies:
 ```bash
-git clone https://github.com/your-username/selective-prompt-anchoring.git
-cd selective-prompt-anchoring
-pip install -e .
+cd backend
+pip install flask
+pip install flask_cors
+pip install sql-metadata
+pip install openai
+pip install nltk
+pip install spacy
+pip install sqlparse
+python -m spacy download en_core_web_sm
 ```
 
-### From HuggingFace
+3. Configure LLM API:
+   - Open `backend/openai_api.py`
+   - Implement your own `get_openai_response()` function
+   - The function should take a string prompt as input and return a string response
 
-```
-pip install huggingface_hub
-pip install git+https://github.com/magic-YuanTian/Selective-Prompt-Anchoring.git
-```
 
-<br>
+### Frontend Setup
 
-## Quick Start ⚡
-
-With pipeline API:
-
-```python
-from transformers import pipeline
-import anchoring
-
-pipe = pipeline(
-    "selective-prompt-anchoring",
-    model="meta-llama/Llama-3.1-8B-Instruct",
-)
-
-output = pipe("How is the weather today?", anchors=['today'])
-print(output["generated_text"])
+1. Install Node.js dependencies:
+```bash
+cd frontend
+npm install
 ```
 
+2. If you encounter missing dependencies, please use `npm install` for necessary packages based on pop-up instructions.
 
-A bit more settings:
+## 🎯 Quick Start
 
-```python
-from transformers import pipeline
-import anchoring  # The pipeline is automatically registered on import
+### Running the Application
 
-# Create pipeline
-spa_pipe = pipeline(
-    "selective-prompt-anchoring",
-    model="meta-llama/Llama-3.1-8B-Instruct",
-    anchoring_strength=3.0,
-    modulated_by_prob=True,
-    use_attention_mask=True,
-    device_map="auto"
-)
-
-# Simple text prompt with global anchors
-prompt = "How is the weather today?"
-global_anchors = ['today']
-
-output = spa_pipe(prompt, anchors=global_anchors, max_new_tokens=1024)
-print(output["generated_text"])
+1. **Start the Backend Server**:
+```bash
+cd backend
+python server.py
 ```
+The backend will run on `http://localhost:5001` by default.
 
-### You can also stream the generation
-
-SPA supports streaming for real-time generation:
-
-```python
-# Get streaming output
-for token in spa_pipe(prompt, anchors=global_anchors, max_new_tokens=1024, stream=True):
-    print(token, end="", flush=True)
-print()
+2. **Start the Frontend**:
+```bash
+cd frontend
+npm start
 ```
+The frontend will run on `http://localhost:3000` by default.
 
-### Batch processing
+3. Open your browser and navigate to `http://localhost:3000`
 
-```python
-# Define a list of prompts
-prompts = ["What's the weather <anchor>today</anchor>?", "What's the weather <anchor>tomorrow</anchor>?"]
+4. Enjoy it! 🎉
 
-# Or with chat format
-prompts = [
-    [
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "What's the weather <anchor>today</anchor>?"}
-    ],
-    [
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "What's the weather <anchor>tomorrow</anchor>?"}
+### Basic Workflow
+
+1. **Schema Tab**: Design or import your database schema
+2. **Database Tab**: Generate synthetic records for your schema
+3. **Dataset Tab**: Synthesize SQL queries and natural language pairs
+4. **Analysis Tab**: Analyze alignment between SQL and natural language
+
+## 🏗️ Architecture
+
+### Backend (`backend/`)
+
+- **`server.py`**: Flask server handling all API endpoints
+- **`SQL_synthesizer.py`**: PCFG-based SQL query generation
+- **`SQL2NL_clean.py`**: Rule-based SQL decomposition and explanation
+- **`llm_analysis.py`**: LLM prompts and analysis functions
+- **`records_synthesizer.py`**: Database record generation with constraint satisfaction
+- **`ICL_retriever.py`**: In-context learning example retrieval
+- **`db_handling.py`**: Database operations and utilities
+- **`openai_api.py`**: LLM API interface (user-implemented)
+- **`evaluation_steps.py`**: Evaluation utilities
+
+### Frontend (`frontend/src/`)
+
+- **`App.jsx`**: Main application component with global state management
+- **`SchemaTab.jsx`**: Interactive schema designer
+- **`DatabaseTab.jsx`**: Database record management interface
+- **`DatasetTab.jsx`**: Dataset synthesis and download
+- **`AnalysisTab.jsx`**: SQL-NL alignment analysis
+- **`SQLSubexpressionCorrespondence.jsx`**: Visual representation of SQL components
+
+### Configuration Files
+
+- **`manual_config.json`**: Manual probability configuration for SQL synthesis
+- **`learned_config.json`**: Learned probability distribution from existing datasets
+- **`spider_example_pool.json`**: Example pool for in-context learning
+
+## 📖 Usage
+
+### Web Interface
+
+#### 1. Schema Design
+
+- **Import Schema**: Drag and drop a JSON schema file
+- **Edit Schema**: Add/remove tables and columns
+- **Define Relationships**: Specify primary and foreign keys
+- **Add Descriptions**: Document tables and columns for better NL generation
+
+Schema format example:
+```json
+{
+  "users": {
+    "comment": "User information table",
+    "columns": [
+      {
+        "field": "user_id",
+        "type": "text",
+        "isPrimary": true,
+        "comment": "Unique user identifier"
+      },
+      {
+        "field": "username",
+        "type": "text",
+        "comment": "User's login name"
+      }
     ]
-]
-
-# Process all prompts
-outputs = spa_pipe(prompts, anchors=['weather'], max_new_tokens=1024)
-for output in outputs:
-    print(output["generated_text"])
-```
-
-
-
-### Direct Usage with `model.generate()`
-
-(**Recommended for developers**) 
-
-*This option is more compatible with Hugging Face API and potentially supports more parameters and models.*
-
-```python
-import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
-from anchoring import SPALogitsProcessor, spa_tokenize
-
-# Load model and tokenizer
-model_name = "meta-llama/Llama-3.1-8B-Instruct"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForCausalLM.from_pretrained(model_name, device_map="auto")
-
-# Define anchors and prompt
-global_anchors = ['today']
-prompt = "How is the weather today?"
-
-# Tokenize with SPA
-main_inputs, aux_inputs, mask_token = spa_tokenize(
-    prompt_with_anchors=prompt,
-    global_anchors=global_anchors,
-    tokenizer=tokenizer,
-    device=model.device
-)
-
-# Create SPA logits processor
-spa_processor = SPALogitsProcessor(
-    aux_model=model, 
-    aux_input_ids=aux_inputs, 
-    strength=3.0,
-    modulated_by_prob=False,
-    use_attention_mask=True,
-    mask_token=mask_token,
-    tokenizer=tokenizer
-)
-
-# Generate text with SPA
-output_sequences = model.generate(
-    input_ids=main_inputs,
-    attention_mask=torch.ones_like(main_inputs),
-    logits_processor=[spa_processor],
-    max_new_tokens=1024,
-    do_sample=False,
-)
-
-# Decode and print
-generated_text = tokenizer.decode(output_sequences[0], skip_special_tokens=True)
-print(generated_text)
-```
-
-<br>
-
-## Input Formats
-
-Our code supports multiple input formats, allowing developers to conveniently represent anchors in prompts or messages. Developers can use inline paired tags, `<anchor> </anchor>`, or a global anchor list to denote anchored text. 
-They can also work with chat messages in a list, following the [OpenAI API standard](https://huggingface.co/docs/text-generation-inference/en/messages_api), or simply use a prompt string.
-
-1️⃣ **String with Global Anchors**
-
-```python
-prompt = "How is the weather today?"
-global_anchors = ['today']
-```
-
-
-2️⃣ **String with Inline Anchors**
-
-```python
-prompt = "What's the weather <anchor>today</anchor>? Think <anchor>step by step</anchor>."
-```
-
-
-3️⃣ **Chat Messages with Message-Level Anchors**
-
-```python
-prompt = [
-    {
-        "role": "system", 
-        "content": "You are a helpful assistant.", 
-        "anchors": ["You", "assistant"]  
-    },
-    {
-        "role": "user",
-        "content": "What's the weather today?", 
-        "anchors": ["today"]
-    },
-]
-```
-
-
-4️⃣ **Chat Messages with Inline Anchors**
-
-```python
-prompt = [
-    {
-        "role": "system", 
-        "content": "You are a helpful assistant."
-    },
-    {
-        "role": "user", 
-        "content": "What's the weather <anchor>today</anchor>?"
-    },
-]
-```
-
-
-
-
-**👉 Two example usage scripts are included under the [example folder](https://github.com/magic-YuanTian/Selective-Prompt-Anchoring/tree/main/examples)!** 
-
-
-<br>
-
-## Hyper-parameters
-
-### SPA-Specific Parameters
-
-- `strength` (default: 1.4): Controls the influence of anchored text.
-  - `1.0`: No effect (normal generation)
-  - `0.0`: Completely ignore anchored text
-  - `>1.0`: Emphasize anchored text (higher values = stronger emphasis)
-  - `<0.0`: Reverse the influence of the anchored text (negative values = stronger reversed influence)
-
-- `modulated_by_prob` (default: True): When True, the anchoring strength is modulated by token probability.
-  - Enable for more stable results, especially with higher anchoring strengths
-  - Disable for more precise control at lower strengths
-  - Hint: Set this as `False` to reproduce the paper settings
-
-- `use_attention_mask` (default: True): When True, uses attention masking for anchor tokens, enhancing the effectiveness of anchoring.
-  - If you observe unexpected behavior, set this as `False`
-  - Hint: Set this as `False` to reproduce the paper setting
-
-### Standard Generation Parameters
-
-SPA supports all standard Hugging Face generation parameters, such as:
-
-- `max_new_tokens`: Maximum number of tokens to generate
-- `do_sample`: Whether to use sampling for generation
-- `temperature`: Controls randomness (higher = more random)
-- `top_p`: Top-p sampling parameter (nucleus sampling)
-- `top_k`: Top-k sampling parameter
-- `min_new_tokens`: Minimum number of tokens to generate
-
-For more parameters, please check the official [Huggingface Transformers' generation documentation](https://huggingface.co/docs/transformers/en/main_classes/text_generation).
-
-<br>
-
-## Practical Hyper-parameter Settings
-
-1. `strength` (Anchoring Strength): 
-   - When you want to increase the model's attention/text emphasis
-       - If `modulated_by_prob = True`, you can give a relatively high value of **anchoring strength** (e.g., 20).
-       - If `modulated_by_prob = False`, we recommend a value less than 2.
-       - If you are pursuing an optimal value, you can easily tune this value through grid search on your benchmark. Our experiment demonstrates that this value follows a simple pattern (as value increases, performance first improves, then declines), and it is easy to tune by dozens of examples.
-   - For reducing (`0 < anchoring_strength < 1`) or reversing (`anchoring_strength < 0`), please set the value based on your concrete needs.
-
-*Note: In our ICML'25 paper, we place less emphasis on `modulated_by_prob` and focus more on the tuning method to demonstrate the impact of this strength value. For further tuning details, please refer to our paper.*
-
-2. `modulated_by_prob` (Weight influence by token probabilities): We recommend setting `modulated_by_prob=True` for stable results. Set it as False if you aim for precise control or have other development needs.  
-
-3. `use_attention_mask` (whether to use attention mask or just special token masking): Set `True` by default for more reliable performance, unless you detect any performance issue, you can set it as `False`, SPA supports a backup masking strategy by special tokens.
-
-<br>
-
-## Compatibility
-
-SPA is a **model-agnostic algorithm**. Our implementation inherits the [Huggingface Transformers](https://github.com/huggingface/transformers) generation API. It should work for **ANY** LLM from [Huggingface model collections](https://huggingface.co/models). Please follow the corresponding model documentation for detailed instructions.
-
-If you have any questions or need support for a specific model, please don't hesitate to submit an issue. We will respond shortly. 😁
-
-<br>
-
-
-## Citation
-
-If you find SPA useful, you could cite by
-
-```bibtex
-@inproceedings{tian2025spa,
-  title = {Selective Prompt Anchoring for Code Generation},
-  author = {Tian, Yuan and Zhang, Tianyi},
-  booktitle = {Proceedings of the 42nd International Conference on Machine Learning (ICML)},
-  year = {2025},
-  url = {https://arxiv.org/abs/2408.09121},
-  eprint = {2408.09121},
-  archivePrefix = {arXiv}
+  }
 }
 ```
 
-<br>
+#### 2. Record Synthesis
+
+- Click "Generate Records" to create synthetic data
+- Specify the number of records to generate
+- Records respect foreign key constraints and data types
+- Export records to JSON
+
+#### 3. SQL Query Synthesis
+
+- Configure query distribution (number of tables, columns, clauses)
+- Generate individual queries or batch synthesis
+- View step-by-step SQL decomposition
+- Get suggested natural language descriptions
+- Check alignment between SQL and NL
+
+#### 4. Dataset Analysis
+
+- Upload existing SQL query datasets
+- View comprehensive statistics:
+  - Keyword distribution
+  - Query structure patterns
+  - Clause complexity
+  - Column and table usage
+  - Query complexity metrics
+
+### Script-Based Synthesis
+
+While human-in-the-loop guarantees the data quality, you can also opt for large-scale dataset generation without the UI:
+
+
+```python
+from server import auto_synthetic_data
+
+synthetic_data = auto_synthetic_data(
+    schema_path="backend/saved_frontend_schema.json",
+    save_path="backend/output_data/synthetic_data.jsonl",
+    config_path="backend/learned_config.json",
+    synthesized_DB_records_path="backend/output_data/DB_records.json",
+    example_path="backend/spider_example_pool.json",
+    data_num=2000
+)
+```
+
+**Parameters**:
+- `schema_path`: Path to the database schema JSON file
+- `save_path`: Output file path for synthetic data
+- `config_path`: Configuration file for query distribution
+- `synthesized_DB_records_path`: Path to save generated database records
+- `example_path`: Path to example pool for in-context learning
+- `data_num`: Number of SQL-NL pairs to generate
+
+## ⚙️ Configuration
+
+### Query Distribution Configuration
+
+Adjust probabilities in `learned_config.json` or `manual_config.json`:
+
+```json
+{
+  "sample_table_probs": [0.5, 0.3, 0.2],
+  "sample_column_probs": [0.4, 0.3, 0.2, 0.1],
+  "select_star_prob": 0.2,
+  "where_clause_prob": 0.3,
+  "group_by_clause_prob": 0.2,
+  "order_by_clause_prob": 0.3,
+  "having_clause_prob": 0.3,
+  "limit_clause_count": 0.1
+}
+```
+
+### Network Configuration
+
+#### Change Backend Port
+
+Edit `backend/server.py`:
+```python
+app.run(debug=True, host="0.0.0.0", port=YOUR_PORT)
+```
+
+#### Change Frontend Port
+
+```bash
+# macOS/Linux
+PORT=4000 npm start
+
+# Windows
+set PORT=4000 && npm start
+```
+
+#### Deploy on Server
+
+Replace `localhost` with your server IP in `frontend/src/App.jsx`:
+```javascript
+const ip = 'your.server.ip';  // or domain name
+const port = 5001;
+```
+
+## 🔌 API Reference
+
+### Key Endpoints
+
+#### `POST /step_by_step_description`
+Generate step-by-step explanation for a SQL query.
+
+**Request**:
+```json
+{
+  "sql": "SELECT name FROM users WHERE age > 18",
+  "schema": {...}
+}
+```
+
+**Response**:
+```json
+{
+  "explanation_data": [...]
+}
+```
+
+#### `POST /suggested_nl`
+Get suggested natural language description for SQL.
+
+**Request**:
+```json
+{
+  "sql": "...",
+  "schema": {...},
+  "parsed_step_by_step_data": [...]
+}
+```
+
+**Response**:
+```json
+{
+  "nl_query": "What are the names of users older than 18?",
+  "examples": [...]
+}
+```
+
+#### `POST /check_alignment`
+Check alignment between NL and SQL components.
+
+**Request**:
+```json
+{
+  "sql": "...",
+  "nl": "...",
+  "schema": {...},
+  "parsed_step_by_step_data": [...]
+}
+```
+
+**Response**:
+```json
+{
+  "alignment_data": [...],
+  "uncovered_substrings": [...]
+}
+```
+
+#### `POST /synthesize_records`
+Generate synthetic database records.
+
+**Request**:
+```json
+{
+  "schema": {...},
+  "num": 100
+}
+```
+
+**Response**:
+```json
+{
+  "synthetic_records": {...}
+}
+```
+
+#### `POST /synthetic_sql`
+Generate a random SQL query.
+
+**Request**:
+```json
+{
+  "schema": {...},
+  "records": {...}
+}
+```
+
+**Response**:
+```json
+{
+  "synthetic_sql": "SELECT ...",
+  "config": {...}
+}
+```
+
+#### `POST /analyze_dataset`
+Analyze an uploaded SQL query dataset.
+
+**Request**: Multipart form data with file upload
+
+**Response**:
+```json
+{
+  "totalQueries": 1000,
+  "averageComplexity": 12.5,
+  "keywordDistribution": {...},
+  "structureDistribution": {...},
+  ...
+}
+```
+
+
+## Project Structure
+
+```
+SQLsynth_repo/
+├── backend/
+│   ├── server.py              # Main Flask server
+│   ├── SQL_synthesizer.py     # Query synthesis engine
+│   ├── SQL2NL_clean.py        # Rule-based SQL parser
+│   ├── llm_analysis.py        # LLM prompts and analysis
+│   ├── records_synthesizer.py # Record generation
+│   ├── ICL_retriever.py       # Example retrieval
+│   ├── db_handling.py         # Database utilities
+│   ├── openai_api.py          # LLM API interface
+│   ├── evaluation_steps.py    # Evaluation tools
+│   ├── *_config.json          # Configuration files
+│   ├── output_data/           # Generated datasets
+│   └── temp_db/               # Temporary databases
+├── frontend/
+│   ├── src/
+│   │   ├── App.jsx            # Main app component
+│   │   ├── SchemaTab.jsx      # Schema designer
+│   │   ├── DatabaseTab.jsx    # Record management
+│   │   ├── DatasetTab.jsx     # Dataset synthesis
+│   │   └── AnalysisTab.jsx    # Analysis interface
+│   ├── public/                # Static assets
+│   └── package.json           # Dependencies
+├── user_study/
+│   └── spider_schemas/        # 166 Spider schemas
+└── README.md
+```
+
+## 📝 Citation
+
+If you use SQLsynth in your research, please cite:
+
+```bibtex
+@inproceedings{Tian_2025, series={IUI ’25},
+   title={Text-to-SQL Domain Adaptation via Human-LLM Collaborative Data Annotation},
+   url={http://dx.doi.org/10.1145/3708359.3712083},
+   DOI={10.1145/3708359.3712083},
+   booktitle={Proceedings of the 30th International Conference on Intelligent User Interfaces},
+   publisher={ACM},
+   author={Tian, Yuan and Lee, Daniel and Wu, Fei and Mai, Tung and Qian, Kun and Sahai, Siddhartha and Zhang, Tianyi and Li, Yunyao},
+   year={2025},
+   month=mar, pages={1398–1425},
+   collection={IUI ’25} }
+
+```
+
+## Acknowledgments
+
+- Adobe Property
 
 ## Contact
 
-- **Email**: [tian211@purdue.edu](mailto:tian211@purdue.edu)  
-- **Website**: [yuan-tian.com](https://yuan-tian.com)
+For questions or feedback, please open an issue on GitHub or contact by tian211@purdue.edu.
+
 
