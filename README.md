@@ -193,6 +193,7 @@ Schema format example:
   }
 }
 ```
+<img width="5128" height="2667" alt="page1" src="https://github.com/user-attachments/assets/dda9b1a3-c811-415a-a5b5-3853363b40e7" />
 
 #### 2. Record Synthesis
 
@@ -200,14 +201,22 @@ Schema format example:
 - Specify the number of records to generate
 - Records respect foreign key constraints and data types
 - Export records to JSON
+  
+<img width="7343" height="4593" alt="page2" src="https://github.com/user-attachments/assets/b41292e2-1203-43bc-9349-646e8c404bc1" />
 
-#### 3. SQL Query Synthesis
+#### 3. NL-SQL pair Synthesis
 
 - Configure query distribution (number of tables, columns, clauses)
 - Generate individual queries or batch synthesis
 - View step-by-step SQL decomposition
 - Get suggested natural language descriptions
 - Check alignment between SQL and NL
+
+<img width="7773" height="6218" alt="page3_core" src="https://github.com/user-attachments/assets/b57c7f71-2242-4c4b-8224-97b4e7c1d8cf" />
+
+
+<img width="6542" height="2690" alt="page3_2" src="https://github.com/user-attachments/assets/0f3c0f36-d3dd-40dd-84dc-8be7585d82ed" />
+
 
 #### 4. Dataset Analysis
 
@@ -218,6 +227,10 @@ Schema format example:
   - Clause complexity
   - Column and table usage
   - Query complexity metrics
+
+<img width="7855" height="5847" alt="page4" src="https://github.com/user-attachments/assets/4cfd0ec4-92a0-4202-8727-7fe305603483" />
+
+
 
 ### Script-Based Synthesis
 
