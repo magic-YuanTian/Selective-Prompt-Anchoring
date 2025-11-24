@@ -19,7 +19,7 @@ This is the official repo for our [<img width="40" height="40" alt="icml" src="h
 
 🌐 **Live Demo**: [Try me](https://hcss.cs.purdue.edu/spa) 👈🏻
 
-⏯️ **Demo Video for Code Generation** [Watch me](https://yuan-tian.com/yuantian_files/spa_demo.mp4)  👈🏻
+⏯️ **Demo Video (Code Generation)**: [Watch me](https://yuan-tian.com/yuantian_files/spa_demo.mp4)  👈🏻
 
 
 <details>
