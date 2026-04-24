@@ -8,9 +8,9 @@
   <a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" alt="License"></a>
 </p>
 
-<p align="center">
+<!-- <p align="center">
   <img width="40" height="40" alt="icml" src="https://github.com/user-attachments/assets/01ffbec2-4026-410f-9c02-3895daeee27c" />
-</p>
+</p> -->
 
 **Selective Prompt Anchoring (SPA)**  is a model-agnostic algorithm designed for large language models (LLMs) that provides fine-grained control over text generation.
 
