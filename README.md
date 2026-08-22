@@ -21,7 +21,7 @@ This is the official repo for our [ICML 2025 work](https://icml.cc/virtual/2025/
 
 📄 **Paper**: [Selective Prompt Anchoring for Code Generation](https://arxiv.org/abs/2408.09121)
 
-🌐 **Live Demo**: [Try me](https://hcss.cs.purdue.edu/spa) 👈🏻
+🌐 **Live Demo**: [Try me](https://yuan-tian.com/demo/spa) 👈🏻
 
 ⏯️ **Demo Video (Code Generation)**: [Watch me](https://yuan-tian.com/yuantian_files/spa_demo.mp4)  👈🏻
 
